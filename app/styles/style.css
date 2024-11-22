@@ -1,0 +1,137 @@
+/* Body Style */
+body {
+    background-color: #253642;  
+}
+
+/* Button Styles */
+div.stButton > button {
+    background-color: None
+    ;
+    color: white;
+    border: 2px solid #253642
+    ;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 16px;
+}
+
+div.stButton > button:hover {
+    background-color: None;
+    border-color: #00838F;
+    color: white;
+}
+
+div.stButton > button:active {
+    background-color: white;
+    border-color: #253642;
+    color: #253642;
+}
+
+div.stBaseButton > button {
+    background-color: None;
+    color: white;
+    border: 1px solid #253642;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.st-emotion-cache-1n47svx {  /* st.SileUploader button*/
+    border-color: #253642;
+    color: white;
+}
+
+.st-emotion-cache-1n47svx:focus:not(:active) {    
+    border-color: #253642;
+    color:#00838F
+}
+
+button[data-testid='stBaseButton-secondary'] > button[kind='secondary']:hover {
+    background-color: None;
+    border-color: #253642;
+    color: #253642;
+}
+
+button[data-testid="stAudioInputActionButton"]  {
+    color:#00838F
+}
+
+button[data-testid="stAudioInputActionButton"]:hover  {
+    color:#01624b
+}
+
+/* File Uploader Styles */
+section[data-testid="stFileUploaderDropzone"]{
+
+    border: 2px solid #00838F;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: None;
+}
+
+div.stFileUploader label {
+    color: #00838F;
+    font-weight: bold;
+}
+
+/* Other Widgets */
+div.stTextArea > div {
+    border: 2px solid #253642;
+    
+    border-radius: 8px;
+}
+
+.st-emotion-cache-13k62yr {    
+    color: #00838F
+}   
+
+/* Style the audio input widget container  __ not working __*/
+.stAudio {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    border: 2px solid #0073e6; /* Blue border */
+    border-radius: 50%; /* Make it round */
+    width: 60px; /* Small width */
+    height: 60px; /* Small height */
+    transition: all 0.3s ease-in-out; /* Smooth scaling */
+}
+.stAudio:hover {
+    width: 100px; /* Expand on hover */
+    height: 100px;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+
+div[data-testid="stAudioInputWaveSurfer"] {
+    color:#00838F
+}
+
+
+div[data-baseweb='select'] > div  {
+    border-color: #253642;
+    font-size: 16px;
+}
+
+/* Sidebar Styles */
+section[data-testid="stSidebar"] {
+    background-color: #253642;
+    border-right: 2px solid #90caf9;
+    color: #474545
+}
+
+/* Text Inputs*/
+.st-fa{    
+    border: 1px solid #253642;
+}
+
+div[data-testid="stTextInputRootElement"]:focus-within {    
+    border: 1px solid white;
+}
+
+/* Sidebar Text*/
+div[data-testid="stMarkdown"] {
+    color: white
+}
