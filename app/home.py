@@ -103,8 +103,8 @@ def logout():
     st.session_state.query = None
     st.session_state.query_id = None
     st.session_state.collection = None
-    st.session_state.vector_store_cards = None
-    st.session_state.vector_store_nephro = None
+    #st.session_state.vector_store_cards = None
+    #st.session_state.vector_store_nephro = None
     st.rerun()
 
 def create_account():
@@ -215,13 +215,13 @@ def set_up_home_pages():
     
     request_1 = st.Page(
         "pages/patient/peds_ai.py",
-        title="Peds Cardiology AI",
+        title="Pediatric AI",
         icon=":material/help:",
         )
 
     provider_1 = st.Page(
         "pages/provider/xray_ai.py",
-        title="X-ray AI",
+        title="X-Ray AI",
         icon=":material/healing:",
     )
 
@@ -242,7 +242,7 @@ def set_up_home_pages():
     provider_pages = [provider_1, provider_2]
     admin_pages = [admin_1]
 
-    st.logo("images/logo.png", icon_image="images/logo.png", size='large')
+    st.logo("images/logo_3 copy.png", icon_image="images/logo.png", size='large')
 
     page_dict = {}
     if st.session_state.role == ['Patient | Family']:

@@ -52,7 +52,7 @@ def client_qdrant_init():
     return client_qdrant
 
 def set_up_page():
-    st.header('Personal AI Assistant')
+    st.header('Multimodal RAGP: Personal AI Assistant')
     st.write('Drop your own document and ask questions about it!')
 
 # Function to set up the file uploader and change the width
@@ -230,8 +230,6 @@ def transcribe_audio(audio_input, client_openai):
     return transcript
         
     # You can now use the transcribed text as input for your model or further processing
-
-
 
 # Similarity Search function
 def perform_similarity_search(query, db):

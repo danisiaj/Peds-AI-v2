@@ -1,18 +1,23 @@
 ## Import necessary libraries ##
 import streamlit as st
 import pandas as pd
-import sqlite3
-import mysql.connector
+import pymysql
+import plotly.express as px
 from openai import OpenAI
 
 ## OpenAI API KEY ##
 API_KEY = st.secrets.openai_api_key
 
+if 'user_queries' not in st.session_state:
+        st.session_state.user_queries = None
+        st.session_state.user_queries.user = None
+        st.session_state.user_queries.query = None
+
 ## Define the functions ##
 def set_up_page():
     """ This function builds the header for the page"""
 
-    st.header("Education Center")
+    st.header("MySQL: Education Center")
  
 def load_data():
     """
@@ -21,27 +26,41 @@ def load_data():
     """
 
     nurses_data = pd.read_csv('./data/nurses_dataset.csv')
-    st.markdown('### _My Nurses:_')
-    st.dataframe(nurses_data.head(), use_container_width=True, hide_index=True)
 
-def define_db_config():
-    """
-    Set up MyQSL connection configuration
+    return nurses_data
 
-    Returns:
-        - db_config: dict
-    """
+def pymysql_connection():
+    return pymysql.connect(
+        host='localhost',  # Replace with your host
+        user='root',  # Replace with your username
+        password=st.secrets.sql_password,  # Replace with your password
+        database='nurses_data'  # Replace with your database name
+    )
 
-    db_config = {
-        "host": "localhost",
-        "user": "root",
-        "password": st.secrets.sql_password,
-        "database": "nurses"
-    }
-    
-    return db_config
+def load_queries_database():
 
-def setup_database_for_user_query(db_config):
+    connection = pymysql_connection()
+    cursor = connection.cursor()
+
+    cursor.execute('SELECT * FROM user_questions;')
+
+    results = cursor.fetchall()
+
+    # Getting column names
+    columns = [desc[0] for desc in cursor.description]
+
+    # Converting the results to a pandas DataFrame
+    user_queries_df = pd.DataFrame(results, columns=columns)
+    st.session_state.user_queries = user_queries_df
+    st.dataframe(st.session_state.user_queries, use_container_width=True, hide_index=True)
+
+    # Closing the connection
+    cursor.close()
+    connection.close()
+
+    return user_queries_df
+
+def setup_database_for_user_query():
     """
     This function builds the table in the dataset in MySQL to store any new question from the user
     *** QUESTIONS COME FROM THE PEDS_AI PAGE
@@ -52,25 +71,26 @@ def setup_database_for_user_query(db_config):
 
 
     # Establish connection with MySQL
-    connection = mysql.connector.connect(**db_config)
+    connection = pymysql_connection()
     cursor = connection.cursor()
 
     # Build the query
     cursor.execute("""
-    DROP TABLE IF EXISTS user_questions;
 
-    CREATE TABLE IF NOT EXISTS user_questions (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        user VARCHAR(255),
-        question TEXT,
-        topic TEXT
+        CREATE TABLE IF NOT EXISTS user_questions (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user VARCHAR(255),
+            question TEXT,
+            topic TEXT
+            )
+        """
     )
-    """)
 
     # Execute the query
+    connection.commit()
     connection.close()
 
-def store_user_question(db_config, df):
+def store_user_question(df):
     """
     This function takes the dataframe with all the questions from the users and update the database in MyQSL
     *** QUESTIONS COME FROM THE PEDS_AI PAGE
@@ -80,7 +100,7 @@ def store_user_question(db_config, df):
     """
 
     # Establish connection
-    connection = mysql.connector.connect(**db_config)
+    connection = pymysql_connection()
 
     # Upload DataFrames to SQL using pymysql connection
     try:
@@ -89,7 +109,7 @@ def store_user_question(db_config, df):
             queries_columns = ', '.join(df.columns)
 
             for index, row in df.iterrows():
-                query_store_queries = f"INSERT INTO personal_info ({queries_columns}) VALUES ({', '.join(['%s'] * len(df.columns))})"
+                query_store_queries = f"INSERT INTO user_questions ({queries_columns}) VALUES ({', '.join(['%s'] * len(df.columns))})"
                 cursor.execute(query_store_queries, tuple(row))
             
             # Commit the transaction
@@ -111,22 +131,24 @@ def execute_sql_query(sql_query):
         - df: Dataframe with the filter information
     """
 
-    # Connect to the SQLite database
-    conn = sqlite3.connect(':memory:')
-    cursor = conn.cursor()
-    
-    # Load and execute SQL script
-    with open('./data/nurses_1.sql') as file:
-        sql_script = file.read()
-    cursor.executescript(sql_script)
-    conn.commit()
-    
-    # Execute the specific query and fetch results into a DataFrame
-    df = pd.read_sql_query(sql_query, conn)
-    
-    # Close the connection after retrieving data
-    conn.close()
+    connection = pymysql_connection()
+    cursor = connection.cursor()
+    cursor.execute(sql_query)
 
+    # Fetching all results
+    results = cursor.fetchall()
+
+    # Getting column names
+    columns = [desc[0] for desc in cursor.description]
+
+    # Converting the results to a pandas DataFrame
+    df = pd.DataFrame(results, columns=columns)
+
+
+
+    # Closing the connection
+    cursor.close()
+    connection.close()
     return df
 
 def sql_query(selection):
@@ -142,17 +164,22 @@ def sql_query(selection):
 
     sql_query = f"""
         SELECT  
-            personal_info._id as ID,
-            last_name as 'Last Name',
-            first_name as 'First Name'
+            personal_info._id AS ID,
+            last_name AS 'Last Name',
+            first_name AS 'First Name',
+            work_info.shift AS 'Shift',
+            work_info.employment_status AS 'Employment Status'
         FROM personal_info
         RIGHT JOIN (
             SELECT
                 education_info._id,
                 {selection.lower()} AS {selection.upper()}
             FROM education_info 
-            WHERE {selection.lower()} = 0) as education
+            WHERE {selection.lower()} = False
+        ) AS education
         ON personal_info._id = education._id 
+        LEFT JOIN work_info
+        ON personal_info._id = work_info._id
         ORDER BY last_name ASC;
     """
 
@@ -165,16 +192,81 @@ def certifications_filters():
     - Execute the query
     - build the Dataframe with the filter information
     """
-
-    certifications = ["BLS", "PALS", "ACEs", "Cardiology Hours", "Transplant Hours", "Nephrology Hours", "Respiratory Hours"]
+    nurses_data = load_data()
+    certifications = [None, "BLS", "PALS", "ACEs", "Cardiology Hours", "Transplant Hours", "Nephrology Hours", "Respiratory Hours"]
     selection = st.selectbox("Filter by Certifications", certifications)  # Select certification
 
-    if selection:
-        st.markdown(f'### _Nurses missing {selection.upper()}:_')
-        query = sql_query(selection.replace(" ", "_"))  # Generate SQL query
-        df = execute_sql_query(query)  # Execute and get the result DataFrame
-        st.write("Total nurses:", len(df))  # Display count
-        st.dataframe(df, use_container_width=True, hide_index=True)  # Display DataFrame
+    if selection is not None:
+        col1, col2 = st.columns([2,3])
+
+        with col1:
+            query = sql_query(selection.replace(" ", "_"))  # Generate SQL query
+            df = execute_sql_query(query)  # Execute and get the result DataFrame
+            st.dataframe(df[['ID', 'First Name', 'Last Name']], use_container_width=False, hide_index=True)  # Display DataFrame
+        with col2:
+            st.metric(label=f'## _Nurses missing {selection.upper()}:_', value=f'{len(df)} ({(len(df)/len(nurses_data)*100)} %)')
+            st.write('_________________________________')
+            df_for_visualization = df[['Shift', 'Employment Status']]
+            full_time_count_am = df[(df['Employment Status'] == 'Full Time') & (df['Shift'] == 'AM')].shape[0]
+            part_time_count_am = df[(df['Employment Status'] == 'Part Time') & (df['Shift'] == 'AM')].shape[0]
+            prn_time_count_am = df[(df['Employment Status'] == 'PRN') & (df['Shift'] == 'AM')].shape[0]
+
+            full_time_count_pm = df[(df['Employment Status'] == 'Full Time') & (df['Shift'] == 'PM')].shape[0]
+            part_time_count_pm = df[(df['Employment Status'] == 'Part Time') & (df['Shift'] == 'PM')].shape[0]
+            prn_time_count_pm = df[(df['Employment Status'] == 'PRN') & (df['Shift'] == 'PM')].shape[0]
+
+            st.markdown('_Day Shift Nurses:_')
+            col2_1, col2_2, col2_3 = st.columns([1,1,1])
+            with col2_1:
+                st.metric(label="FT Employees", value=full_time_count_am)
+            with col2_2:
+                st.metric(label="PT Employees", value=part_time_count_am)
+            with col2_3:
+                st.metric(label="PRN Employees", value=prn_time_count_am)
+
+            st.markdown('_Night Shift Nurses:_')
+            col3_1, col3_2, col3_3 = st.columns([1,1,1])
+            with col3_1:
+                st.metric(label="FT Employees", value=full_time_count_pm)
+            with col3_2:
+                st.metric(label="PT Employees", value=part_time_count_pm)
+            with col3_3:
+                st.metric(label="PRN Employees", value=prn_time_count_pm)
+
+        col3, col4 = st.columns([1,1])
+        with col3:
+            fig_1 = px.pie(df_for_visualization, names='Shift', title='Shift Distribution')
+            st.plotly_chart(fig_1)
+            shift_counts = df_for_visualization['Shift'].value_counts()
+            st.bar_chart(shift_counts, use_container_width=False, width=300, height=150, horizontal=True)
+        with col4:
+            fig_2 = px.pie(df_for_visualization, names='Employment Status', title='Employment Distribution')
+            st.plotly_chart(fig_2)
+            status_counts = df_for_visualization['Employment Status'].value_counts()
+            st.bar_chart(status_counts, use_container_width=False, width=300, height=150, horizontal=True)
+
+        df_for_visualization['Shift & Status'] = df_for_visualization['Shift'] + ' - ' + df_for_visualization['Employment Status']
+
+        # Calculate value counts for each combination
+        value_counts = df_for_visualization['Shift & Status'].value_counts().reset_index()
+        value_counts.columns = ['Shift & Status', 'Count']
+
+        # Create a pie chart using the value counts and show counts in labels
+        fig_3 = px.pie(
+            value_counts, 
+            names='Shift & Status', 
+            values='Count', 
+            title='Shift and Employment Status Distribution',
+            labels={'Shift & Status': 'Shift & Status'},
+            hover_data=['Count'],  # Add count info on hover
+        )
+        st.plotly_chart(fig_3)
+
+            
+
+    else:
+        st.markdown('### _All Nurses:_')
+        st.dataframe(nurses_data, use_container_width=True, hide_index=True)
 
 def analyze_queries():
     """
@@ -185,7 +277,7 @@ def analyze_queries():
     """
 
     queries = '\n'
-    for user, question in zip(st.session_state.nurses_data.user, st.session_state.nurses_data.question):
+    for user, question in zip(st.session_state.user_queries.user, st.session_state.user_queries.question):
         queries += '\Queries:\n'
         queries += f'user: {str(user)} -> {str(question)}\n\n'
 
@@ -230,50 +322,45 @@ def query_history():
 
     st.markdown('### _Query History:_')
     # Initialize 'nurses_data' in session state if it doesn't exist
-    if 'nurses_data' not in st.session_state:
-        st.session_state.nurses_data = pd.DataFrame(columns=['user', 'question'])
-        if len(st.session_state.nurses_data) == 0:
-            st.markdown("** Query history empty **")
-        
+
     # Check if user and query are not None before continuing
     if st.session_state.user is not None and st.session_state.query is not None:        
         # Check if the combination of 'user' and 'question' in new_row already exists in nurses_data
-        if not ((st.session_state.nurses_data.user == st.session_state.user) & 
-                (st.session_state.nurses_data.question == st.session_state.query)).any():
+        if not ((st.session_state.user_queries.user == st.session_state.user) & 
+                (st.session_state.user_queries.question == st.session_state.query)).any():
             # Merge only if it doesn't exist
             new_row = pd.DataFrame([{
                                 'user': st.session_state.user, 
                                 'question': st.session_state.query,
                                 'topic':st.session_state.collection
                                 }])
-
-            st.session_state.nurses_data = pd.concat([st.session_state.nurses_data, new_row], ignore_index=True)
+            user_queries = pd.concat([st.session_state.user_queries, new_row], ignore_index=True)
+            st.session_state.user_queries = user_queries
             
             # Update MySQL database with the new datapoint
             setup_database_for_user_query()
             store_user_question(new_row) 
 
         else:
-            pass      
+            pass
+      
+    load_queries_database()
 
+    # Option for the user to analyze the questions through an LLM
+    if st.button('Analyze queries') and len(st.session_state.user_queries) > 0:
+        analysis = analyze_queries()
+        st.markdown(analysis)
 
-        # Display the updated dataframe
-        st.dataframe(st.session_state.nurses_data, use_container_width=True)
-
-        # Option for the user to analyze the questions through an LLM
-        if st.button('Analyze queries') and len(st.session_state.nurses_data) > 0:
-            analysis = analyze_queries()
-            st.markdown(analysis)
-   
-    elif st.session_state.query is None:
-        pass
 
 def main():
 
     set_up_page()
-    load_data()
-    certifications_filters()
-    query_history()
+    tab1, tab2 = st.tabs(["Nurses", "Queries"])
+    with tab1:
+        certifications_filters()
+    with tab2:
+        query_history()
+
 
 ## Initialize the app   
 main()

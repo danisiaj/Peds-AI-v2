@@ -52,6 +52,23 @@ button[data-testid='stBaseButton-secondary'] > button[kind='secondary']:hover {
     color: #253642;
 }
 
+.st-emotion-cache-1n47svx.ef3psqc19:hover{
+    background-color: None;
+    border-color: #253642;
+    color:#00838F
+}
+
+.st-emotion-cache-1n47svx:active:not(:focus){
+    background-color: white;
+    border-color: #253642;
+    color:#00838F
+}
+.st-emotion-cache-1n47svx:focus:active{
+    background-color: white;
+    border-color: #253642;
+    color:#00838F
+}
+
 button[data-testid="stAudioInputActionButton"]  {
     color:#00838F
 }
@@ -135,3 +152,42 @@ div[data-testid="stTextInputRootElement"]:focus-within {
 div[data-testid="stMarkdown"] {
     color: white
 }
+
+.st-fd {
+    color: #00838F
+}
+button[data-testid="stTab"] :hover{
+
+    color: #00838F
+
+}
+
+button[data-testid="stTab"] :focus{
+    color: #00838F
+}
+
+.st-fd {
+    color: #00838F
+}
+
+.st-fk:hover{
+    color: #00838F
+
+}
+
+
+.st-fk:focus{
+    color: #00838F
+
+}
+.st-fd :hover{
+    color: #00838F
+}
+
+.st-fd :focus{
+    color: #00838F
+}
+.st-fq {
+    background-color: #00838F
+}
+

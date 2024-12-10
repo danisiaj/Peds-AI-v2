@@ -2,6 +2,8 @@
 ## Import Necessary Libraries
     
 import streamlit as st
+import pandas as pd
+import pymysql
 import time
 from openai import OpenAI
 from langchain_openai import OpenAIEmbeddings
@@ -71,7 +73,7 @@ def set_up_page():
         - collection: str
     """
 
-    st.header('Peds Cardiology AI')
+    st.header('Multimodal RAG: Pediatric AI')
     collection = st.selectbox("   Choose your topic", COLLECTIONS) 
     if st.session_state.role == 'Patient | Family':
         with st.sidebar:
@@ -320,6 +322,102 @@ def transcribe_audio(audio_input, client_openai):
         
     # You can now use the transcribed text as input for your model or further processing
 
+def pymysql_connection():
+    return pymysql.connect(
+        host='localhost',  # Replace with your host
+        user='root',  # Replace with your username
+        password=st.secrets.sql_password,  # Replace with your password
+        database='nurses_data'  # Replace with your database name
+    )
+
+def setup_database_for_user_query():
+    """
+    This function builds the table in the dataset in MySQL to store any new question from the user
+    *** QUESTIONS COME FROM THE PEDS_AI PAGE
+
+    Arguments:
+        - db_config: dict, information to connect to MySQL
+    """
+
+
+    # Establish connection with MySQL
+    connection = pymysql_connection()
+    cursor = connection.cursor()
+
+    # Build the query
+    cursor.execute("""
+
+        CREATE TABLE IF NOT EXISTS user_questions (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user VARCHAR(255),
+            question TEXT,
+            topic TEXT
+            )
+        """
+    )
+
+    # Execute the query
+    connection.commit()
+    connection.close()
+
+def store_user_question(df):
+    """
+    This function takes the dataframe with all the questions from the users and update the database in MyQSL
+    *** QUESTIONS COME FROM THE PEDS_AI PAGE
+
+    Arguments:
+        - db_config: dict, information to connect to MySQL
+    """
+
+    # Establish connection
+    connection = pymysql_connection()
+
+    # Upload DataFrames to SQL using pymysql connection
+    try:
+        with connection.cursor() as cursor:
+            # Insert data into personal_info table
+            queries_columns = ', '.join(df.columns)
+
+            for index, row in df.iterrows():
+                query_store_queries = f"INSERT INTO user_questions ({queries_columns}) VALUES ({', '.join(['%s'] * len(df.columns))})"
+                cursor.execute(query_store_queries, tuple(row))
+            
+            # Commit the transaction
+            connection.commit()
+            print("DataFrames uploaded successfully.")
+    except Exception as e:
+        print("Error while uploading DataFrames:", e)
+    finally:
+        connection.close() 
+
+def query_history():
+    """
+    This function stores the user, question and the topic in a dataframe. 
+    """
+    
+    # Check if user and query are not None before continuing
+    if st.session_state.user is not None and st.session_state.query is not None:        
+        # Check if the combination of 'user' and 'question' in new_row already exists in nurses_data
+        if not ((st.session_state.user_queries.user == st.session_state.user) & 
+                (st.session_state.user_queries.question == st.session_state.query)).any():
+            # Merge only if it doesn't exist
+            new_row = pd.DataFrame([{
+                                'user': st.session_state.user, 
+                                'question': st.session_state.query,
+                                'topic':st.session_state.collection
+                                }])
+            user_queries = pd.concat([st.session_state.user_queries, new_row], ignore_index=True)
+            st.session_state.user_queries = user_queries
+            
+            # Update MySQL database with the new datapoint
+            setup_database_for_user_query()
+            store_user_question(new_row) 
+
+        else:
+            pass
+      
+    elif st.session_state.query is None:
+        pass
 
 
 # Similarity Search function
@@ -426,7 +524,7 @@ def get_response_from_client(prompt, client_openai):
     return answer
 
 # COMBINE THE PREVIOUS FUNCTIONS
-def get_response(db, query, client_openai):
+def get_response(db, query, client_openai, collection):
     """
     This function takes the vector store (with embeddings) and the query from the user
     and applies the different functions to retrieve the data relevant to the query,
@@ -462,17 +560,19 @@ def set_up_user_form(collection, query, client_openai):
         db = st.session_state["vector_store_cards"]
         st.session_state.collection = "Cardiology"
 
-    # Simulate response retrieval
-    with st.spinner('Generating response...'):
-        answer = get_response(db, query, client_openai) 
-    
-    # Clear the progress bar
-    
+    col1, col2, = st.columns([1,1])
+    ##### Generate response #####
+    with col1:
+        with st.spinner('Generating response...'):
+            answer = get_response(db, query, client_openai, collection) 
+            with col2:
 
-    ##### Evaluate response #####
-    with st.spinner('Evaluating response...'):
-        prompt_for_eval = generate_prompt_for_eval(query, answer) 
-        evaluation = get_evaluation_from_LLM_as_a_judge(client_openai, prompt_for_eval)
+        ##### Evaluate response #####
+                with st.spinner('Evaluating response...'):
+                    prompt_for_eval = generate_prompt_for_eval(query, answer) 
+                    evaluation = get_evaluation_from_LLM_as_a_judge(client_openai, prompt_for_eval)
+
+
                 
 
         #####. Display answer
@@ -553,16 +653,18 @@ def get_evaluation_from_LLM_as_a_judge(client_openai, prompt_for_eval):
 
     return evaluation
 
-def peds_ai_app(collection):
+def main():
     client_openai = client_openai_init()
+    collection = set_up_page()
     query = get_query()
+
     audio_input = st.audio_input("Use microphone")
     if audio_input is not None:
         query = transcribe_audio(audio_input, client_openai)
     if st.button('Submit') and query is not None:
         st.session_state.query = query # Stores query into current session for later use of the data
+        query_history()
         set_up_user_form(collection, query, client_openai)
 
 
-collection = set_up_page()
-peds_ai_app(collection)
+main()

@@ -86,7 +86,7 @@ def main():
             st.markdown(f"### Prediction: {result}")
 
             # Display the uploaded image
-            st.image(uploaded_img, caption=f"Prediction: {result}", use_container_width=True)
+            st.image(uploaded_img, caption=f"Prediction: {result}", use_container_width=False, width=500)
 
         except Exception as e:
             st.error(f"An error occurred: {e}")
