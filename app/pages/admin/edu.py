@@ -36,10 +36,10 @@ def pymysql_connection():
 
     return pymysql.connect(
         host='nurses.cngouckso452.eu-north-1.rds.amazonaws.com',  
-        user=st.secrets["mysql"]["user"],      
-        password=st.secrets["mysql"]["sql_password"], 
-        database=st.secrets["mysql"]["database"],  
-        port=st.secrets["mysql"]["port"]  
+        user='remote_user',      
+        password='0000', 
+        database='nurses',  
+        port=3306 
     )
 
 def load_queries_database():
