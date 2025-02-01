@@ -209,7 +209,7 @@ def set_up_home_pages():
     provider_pages = [provider_1, provider_2]
     admin_pages = [admin_1]
 
-    st.logo("images/logo_3 copy.png", icon_image="images/logo.png", size='large')
+    st.logo(image="images/logo_3_copy.png", icon_image="images/logo.png")
 
     page_dict = {}
     if st.session_state.role == ['Patient | Family']:
@@ -244,8 +244,6 @@ def main():
     """
 
     # Initiate CSS style file
-    css = load_css("./styles/style.css")
-    st.markdown(css, unsafe_allow_html=True)
 
 
     # Build the pages for the app
