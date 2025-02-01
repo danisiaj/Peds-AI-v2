@@ -7,6 +7,7 @@ from openai import OpenAI
 
 ## OpenAI API KEY ##
 API_KEY = st.session_state.open_ai_api_key
+RDS_ENDPOINT = st.secrets.rds_end_point
 MYSQL_PASSWORD = st.secrets.sql_password
 
 ## Define the functions ##
@@ -35,7 +36,7 @@ def pymysql_connection():
     """
 
     return pymysql.connect(
-        host='127.0.0.1',  
+        host=RDS_ENDPOINT,  
         user='remote_user',  
         password=MYSQL_PASSWORD,  
         database='nurses_data'  
