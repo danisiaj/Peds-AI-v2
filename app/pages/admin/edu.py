@@ -18,7 +18,7 @@ def set_up_page():
     st.info("""This service provides access a database in MySQL that contains:
             \n 1. Personal, Work and Education information about the nursing team.
             \n 2. The queries/questions made by the users in the Pediatric AI RAG models.""")
- 
+    st.write(st.secrets)
 def load_data():
     """
     This function loads a dataset with all the nurses information 
