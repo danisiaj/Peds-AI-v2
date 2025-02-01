@@ -82,7 +82,6 @@ PyMySQL==1.1.1
 pypdfium2==4.30.0
 python-dateutil==2.9.0.post0
 pytz==2024.2
-pywin32==308
 PyYAML==6.0.2
 qdrant-client==1.12.1
 referencing==0.35.1
