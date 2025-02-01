@@ -20,7 +20,7 @@ def load_model():
         - model: keras CNN model
     """
     
-    model = models.load_model('./pages/provider/best_model-0.95.keras')
+    model = models.load_model('pages/provider/best_model-0.95.keras')
 
     return model
 
