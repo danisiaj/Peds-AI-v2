@@ -64,7 +64,7 @@ def login():
         last_name = st.text_input(" Patient's last name and MRN: ", placeholder="Last Name")
         mrn = st.text_input("MRN: ", label_visibility='collapsed', placeholder="Medical Record Number")
 
-        if mrn == st.secrets.MRN and last_name == st.secrets.patient_last_name:
+        if mrn == st.secrets.MRN and last_name.lower() == st.secrets.patient_last_name:
             status = True
         else:
             pass
@@ -72,7 +72,7 @@ def login():
     elif role == "Provider":
         username = st.text_input("  Credentials: ", placeholder="Username")
         password = st.text_input("Password", label_visibility='collapsed', placeholder="Password")
-        if username == st.secrets.user_provider and password == st.secrets.password_provider:
+        if username.lower() == st.secrets.user_provider and password == st.secrets.password_provider:
             status = True
         else:
             pass
@@ -80,7 +80,7 @@ def login():
     elif role == "Educator | Admin":
         username = st.text_input("  Admin Creadentials: ", placeholder="Username")
         password = st.text_input("Admin password: ", label_visibility='collapsed', placeholder="Password", type='password')
-        if username == st.secrets.user_admin and password == st.secrets.password_admin:
+        if username.lower() == st.secrets.user_admin and password == st.secrets.password_admin:
             status = True
         else:
             pass
@@ -242,11 +242,6 @@ def main():
     This function calls the CSS style file and sets all the instantiates all the session variables
     It also sets up the different pages of the app
     """
-
-    # Initiate CSS style file
-
-
-    # Build the pages for the app
     set_up_home_pages()
 
 
