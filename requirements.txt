@@ -57,7 +57,7 @@ mysql==0.0.3
 mysql-connector==2.2.9
 mysqlclient==2.2.6
 namex==0.0.8
-narwhals==1.14.1
+narwhals>=1.15.1
 numpy==1.26.4
 openai==1.54.5
 opt_einsum==3.4.0
