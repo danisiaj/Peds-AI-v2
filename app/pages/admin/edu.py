@@ -7,7 +7,7 @@ from openai import OpenAI
 
 ## OpenAI API KEY ##
 API_KEY = st.session_state.open_ai_api_key
-MYSQL_PASSWORD = st.secrets.sql_password
+# MYSQL_PASSWORD = st.secrets.sql_password
 
 ## Define the functions ##
 
@@ -25,7 +25,6 @@ def load_data():
     It also builds a dataframe widget in the app for visualization purposes
     """
 
-    nurses_data = pd.read_csv('app/data/nurses_dataset.csv')
 
     return nurses_data
 
@@ -35,11 +34,11 @@ def pymysql_connection():
     """
 
     return pymysql.connect(
-        host='192.168.86.23',  
-        user='remote_user',      
-        password='0000', 
-        database='nurses_data',  
-        port=3306 
+        host=st.secrets.mysql.endpoint,  
+        user=st.secrets.mysql.sql_user,      
+        password=st.secrets.mysql.sql_password, 
+        database=st.secrets.mysql.database,  
+        port=st.secrets.mysql.port 
     )
 
 def load_queries_database():
