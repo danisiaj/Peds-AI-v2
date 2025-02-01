@@ -25,6 +25,7 @@ def load_data():
     It also builds a dataframe widget in the app for visualization purposes
     """
 
+    nurses_data = pd.read_csv('data/nurses_dataset.csv')
 
     return nurses_data
 
