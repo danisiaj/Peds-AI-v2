@@ -7,7 +7,7 @@ from openai import OpenAI
 
 ## OpenAI API KEY ##
 API_KEY = st.session_state.open_ai_api_key
-RDS_ENDPOINT = st.secrets.rds_endpoint
+RDS_ENDPOINT = st.secrets.endpoint
 MYSQL_PASSWORD = st.secrets.sql_password
 
 ## Define the functions ##
