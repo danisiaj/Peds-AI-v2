@@ -35,11 +35,11 @@ def pymysql_connection():
     """
 
     return pymysql.connect(
-        host=st.secrets.endpoint,  
-        user=st.secrets.mysql.sql_user,      
-        password=st.secrets.mysql.sql_password, 
-        database=st.secrets.mysql.database,  
-        port=st.secrets.mysql.port 
+        host=st.secrets.host,  
+        user=st.secrets.sql_user,      
+        password=st.secrets.sql_password, 
+        database=st.secrets.database,  
+        port=st.secrets.port 
     )
 
 def load_queries_database():
