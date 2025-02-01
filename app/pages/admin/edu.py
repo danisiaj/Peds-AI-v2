@@ -35,7 +35,7 @@ def pymysql_connection():
     """
 
     return pymysql.connect(
-        host=st.secrets["endpoint"],  
+        host='nurses.cngouckso452.eu-north-1.rds.amazonaws.com',  
         user=st.secrets["mysql"]["user"],      
         password=st.secrets["mysql"]["sql_password"], 
         database=st.secrets["mysql"]["database"],  
