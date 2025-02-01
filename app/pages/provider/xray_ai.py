@@ -1,7 +1,6 @@
 ## Import necessary libraries ##
 import streamlit as st
-from tensorflow.keras import models
-from tensorflow import expand_dims
+import tensorflow as tf
 import numpy as np
 from PIL import Image
 
@@ -20,7 +19,7 @@ def load_model():
         - model: keras CNN model
     """
     
-    model = models.load_model('pages/provider/best_model-0.95.keras')
+    model = tf.keras.models.load_model('./pages/provider/best_model-0.95.keras')
 
     return model
 
@@ -47,7 +46,7 @@ def preprocess_image(uploaded_img):
     image_array = np.array(image) / 255.0
 
     # Expand dimensions to match the model's expected input shape
-    image_tensor = expand_dims(image_array, axis=0)
+    image_tensor = tf.expand_dims(image_array, axis=0)
 
     return image_tensor
 
