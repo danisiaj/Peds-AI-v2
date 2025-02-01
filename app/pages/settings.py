@@ -9,7 +9,7 @@ def save_changes(temperature, max_tokens):
 
 def set_up_page():
     st.header('Settings')
-    st.image('./images/logo_2.png', width=100)
+    st.image('images/logo_3_copy.png', width=100)
     st.markdown(f'##### _Role:_         {st.session_state.role}')
     col1, col2 = st.columns([1,1])
     with col1:
