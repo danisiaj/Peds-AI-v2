@@ -35,7 +35,7 @@ def pymysql_connection():
     """
 
     return pymysql.connect(
-        host='localhost',  
+        host='127.0.0.1',  
         user='root',  
         password=MYSQL_PASSWORD,  
         database='nurses_data'  
