@@ -209,7 +209,7 @@ def set_up_home_pages():
     provider_pages = [provider_1, provider_2]
     admin_pages = [admin_1]
 
-    st.logo(image="images/logo_3_copy.png", icon_image="images/Logo.png")
+    #st.logo(image="images/logo_3_copy.png", icon_image="images/Logo.png")
 
     page_dict = {}
     if st.session_state.role == ['Patient | Family']:
