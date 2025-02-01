@@ -46,7 +46,13 @@ def login():
 
     ST.SECRETS NEEDED!!
     """
-    
+    st.info("""
+        This APP integrates almost all the concepts learned in my Data Science & Machine Learning Bootcamp through IronHack.
+            \n Peds AI App was created by a nurse who works in a Pediatric Cardiology Floor in the hospital. The goal of the app is to enhance education for patients, family members and providers. 
+            \n Peds AI adds different features depending WHO is logging in, giving special priviledges to Educators and Administrators.
+            \n Login info: username/last name = 'user' ; password/MRN = 12345
+            \n Enjoy!       
+            \n YOU WILL NEED YOUR OPENAI API KEY!""")
     status = False
     st.subheader("Log in")
     role = st.selectbox("   Choose your role", ROLES)
@@ -86,9 +92,6 @@ def login():
             with col3:
                 with st.spinner("Checking credentials..."):
                     if status == True:
-
-                        # db_nephrology = load_nephro_vector_store()
-                        # st.session_state['vector_store_nephro'] = db_nephrology
                         st.success("Access granted!")
                         st.session_state.role = role
                         if role == 'Patient | Family':
@@ -160,6 +163,7 @@ def set_up_home_pages():
     This function builds all the different pages and permissions, based on the user's role.
     It also builds the st.navigation sidebar after log in.
     """
+
     logout_page = st.Page(logout, 
         title="Log out", 
         icon=":material/logout:"

@@ -7,6 +7,7 @@ from openai import OpenAI
 
 ## OpenAI API KEY ##
 API_KEY = st.secrets.openai_api_key
+MYSQL_PASSWORD = st.secrets.sql_password
 
 ## Define the functions ##
 
@@ -28,42 +29,7 @@ def load_data():
 
     return nurses_data
 
-def get_sql_password(key_prefix="default"):
-    """
-    This function defines the password that will be used for pymysql connection.
-    
-    Args:
-        key_prefix (str): A prefix to ensure unique Streamlit component keys.
-    
-    Returns:
-        password (str): The password for the MySQL connection.
-    """
-    try:
-        # Check if the password is defined in Streamlit secrets
-        if st.secrets.get("sql_password", "") != "":
-            password = st.secrets.sql_password
-        else:
-            # Prompt the user to enter the password
-            password = st.text_input(
-                'Enter your SQL password:', 
-                placeholder='MySQL password', 
-                type="password", 
-                key=f"{key_prefix}_sql_password_input"
-            )
-    except AttributeError:
-        # Handle the case where st.secrets is not configured
-        st.warning("No password found in Streamlit secrets. Please enter your SQL password below.")
-        password = st.text_input(
-            'Enter your SQL password:', 
-            placeholder='MySQL password', 
-            type="password", 
-            key=f"{key_prefix}_sql_password_input_fallback"
-        )
-
-    return password
-
-
-def pymysql_connection(password):
+def pymysql_connection():
     """
     This function starts the connection with MySQL for data analytics
     """
@@ -71,11 +37,11 @@ def pymysql_connection(password):
     return pymysql.connect(
         host='localhost',  
         user='root',  
-        password=password,  
+        password=MYSQL_PASSWORD,  
         database='nurses_data'  
     )
 
-def load_queries_database(password):
+def load_queries_database():
     """
     This function loads the collection that contains all the questions users have made to the RAG model
     for further analysis and visualization
@@ -83,7 +49,7 @@ def load_queries_database(password):
     Returns: User's queries in a pandas dataframe
     """
 
-    connection = pymysql_connection(password)
+    connection = pymysql_connection()
     cursor = connection.cursor()
 
     cursor.execute('SELECT * FROM user_questions;')
@@ -104,7 +70,7 @@ def load_queries_database(password):
 
     return user_queries_df
 
-def setup_database_for_user_query(password):
+def setup_database_for_user_query():
     """
     This function builds the table in the dataset in MySQL to store any new question from the user
     *** QUESTIONS COME FROM THE PEDS_AI PAGE
@@ -115,7 +81,7 @@ def setup_database_for_user_query(password):
 
 
     # Establish connection with MySQL
-    connection = pymysql_connection(password)
+    connection = pymysql_connection()
     cursor = connection.cursor()
 
     # Build the query
@@ -134,7 +100,7 @@ def setup_database_for_user_query(password):
     connection.commit()
     connection.close()
 
-def store_user_question(df, password):
+def store_user_question(df):
     """
     This function takes the dataframe with all the questions from the users and update the database in MyQSL
     *** QUESTIONS COME FROM THE PEDS_AI PAGE
@@ -144,7 +110,7 @@ def store_user_question(df, password):
     """
 
     # Establish connection
-    connection = pymysql_connection(password)
+    connection = pymysql_connection()
 
     # Upload DataFrames to SQL using pymysql connection
     try:
@@ -358,7 +324,7 @@ def analyze_queries():
 
     return answer
 
-def query_history(password):
+def query_history():
     """
     This function stores the user, question and the topic in a dataframe. 
     The dataframe is printed for visualization purposes and stored in MySQL database
@@ -383,15 +349,15 @@ def query_history(password):
             st.session_state.user_queries = user_queries
             
             # Update MySQL database with the new datapoint
-            setup_database_for_user_query(password)
-            store_user_question(new_row, password) 
-            load_queries_database(password)
+            setup_database_for_user_query()
+            store_user_question(new_row) 
+            load_queries_database()
 
         else:
-            load_queries_database(password)
+            load_queries_database()
 
     else: 
-        load_queries_database(password)
+        load_queries_database()
 
     # Option for the user to analyze the questions through an LLM
     if st.button('Analyze queries') and len(st.session_state.user_queries) > 0:
@@ -407,15 +373,7 @@ def main():
         certifications_filters()
     with tab2:
         st.info('This tab uses MySQL to load the dataframe containing the queries made by different users')
-        password = get_sql_password()
-        if password:
-            query_history(password)
-        else:
-            pass
-
-
-
-        
+        query_history()
 
 
 
