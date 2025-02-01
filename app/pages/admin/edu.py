@@ -34,7 +34,7 @@ def pymysql_connection():
     """
 
     return pymysql.connect(
-        host=st.secrets.mysql.endpoint,  
+        host=st.secrets.endpoint,  
         user=st.secrets.mysql.sql_user,      
         password=st.secrets.mysql.sql_password, 
         database=st.secrets.mysql.database,  
