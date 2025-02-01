@@ -19,7 +19,7 @@ def load_model():
         - model: keras CNN model
     """
     
-    model = tf.keras.models.load_model('pages/provider/best_model-0.95.keras')
+    model = tf.keras.models.load_model('app/pages/provider/best_model-0.95.keras')
 
     return model
 
