@@ -10,7 +10,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from uuid import uuid4
 import time
 
-API_KEY = st.secrets.openai_api_key
+API_KEY = st.session_state.open_ai_api_key
 
 # Initiliaze Open AI
 def client_openai_init():
@@ -53,6 +53,10 @@ def client_qdrant_init():
 
 def set_up_page():
     st.header('Multimodal RAGP: Personal AI Assistant')
+    st.info("""This page is the 'Original RAG Model', where the user can upload a document and ask questions about it.
+            \nDepending on the length of the document:\n
+            \n   *If the document is short, the program will add the documetn straight to the LLM prompt.\n
+            \n   *If the document is long, the document will be embedded into a vector database using OpenAI Embeddings and :memory: local mode""")
     st.write('Drop your own document and ask questions about it!')
 
 # Function to set up the file uploader and change the width
@@ -476,20 +480,21 @@ def get_evaluation_from_LLM_as_a_judge(client_openai, prompt_for_eval):
 def main():
     set_up_page()
     uploaded_file = set_up_doc_uploader()
-    if uploaded_file is None:
-        pass
-    else:
+    if uploaded_file is not None:
         query = get_query()
         pages = load_and_split_pdf(uploaded_file)
         if st.button('Submit') and query is not None and pages != 0:
             if len(pages) > 4:
                 db = upload_document(pages)
                 docs = perform_similarity_search(query, db)
-                context =get_context_from_docs(docs)
+                context = get_context_from_docs(docs)
                 set_up_user_form(context, query)
             elif len(pages) <= 4:
                 context = get_context_from_pages(pages)
                 set_up_user_form(context, query)
+        
+    else:
+        pass
     
 
 main()

@@ -1,11 +1,29 @@
 ## Import necessary librries ##
 import streamlit as st
-from langchain_qdrant import QdrantVectorStore, RetrievalMode
-from langchain_openai import OpenAIEmbeddings
-from qdrant_client.http.models import Distance
 
 ## Define the differnt roles for the user ##
 ROLES = [None, "Patient | Family", "Provider", "Educator | Admin"]
+# Initiate all the session variables
+if "role" not in st.session_state:
+    st.session_state.role = None
+if "user" not in st.session_state:
+    st.session_state.user = None
+if "mrn" not in st.session_state:
+    st.session_state.mrn = None
+if "last_name" not in st.session_state:
+    st.session_state.last_name = None
+if "query" not in st.session_state:
+    st.session_state.query = None
+if 'user_queries' not in st.session_state:
+    st.session_state.user_queries = None
+if 'collection' not in st.session_state:
+    st.session_state.collection = None
+if 'vector_store_cards' not in st.session_state:
+    st.session_state.vector_store_cards = None
+if 'cardiac_defect' not in st.session_state:
+    st.session_state.cardiac_defect = None
+
+
 
 ## Define all the functions ##
 def load_css(file_name):
@@ -68,20 +86,18 @@ def login():
             with col3:
                 with st.spinner("Checking credentials..."):
                     if status == True:
-                        with st.spinner("Loading database..."):
-                            db_cardiology = load_cardiac_vector_store()
-                            st.session_state['vector_store_cards'] = db_cardiology
-                            db_nephrology = load_nephro_vector_store()
-                            st.session_state['vector_store_nephro'] = db_nephrology
-                            st.success("Access granted!")
-                            st.session_state.role = role
-                            if role == 'Patient | Family':
-                                st.session_state.user = last_name
-                                st.session_state.mrn = mrn
-                                with st.sidebar:
-                                    st.write(f"Welcome, {st.session_state.user}, MRN:{st.session_state.mrn}")
-                            elif role in ['Educator | Admin', 'Provider']:
-                                st.session_state.user = username
+
+                        # db_nephrology = load_nephro_vector_store()
+                        # st.session_state['vector_store_nephro'] = db_nephrology
+                        st.success("Access granted!")
+                        st.session_state.role = role
+                        if role == 'Patient | Family':
+                            st.session_state.user = last_name
+                            st.session_state.mrn = mrn
+
+                                
+                        elif role in ['Educator | Admin', 'Provider']:
+                            st.session_state.user = username
 
                         st.rerun()   
                     
@@ -102,7 +118,7 @@ def logout():
     st.session_state.last_name = None
     st.session_state.query = None
     st.session_state.query_id = None
-    st.session_state.collection = None
+    #st.session_state.collection = None
     #st.session_state.vector_store_cards = None
     #st.session_state.vector_store_nephro = None
     st.rerun()
@@ -139,65 +155,6 @@ def create_account():
     else:
         pass
 
-def openai_embeddings():
-    """
-    This function builds the embeddings function using the OpenAI API
-    API_KEY from OpenAI needed!
-
-    Returns: 
-        -embedding_model, embedding function from OpenAI
-    """
-
-    embeddings_model = OpenAIEmbeddings(model="text-embedding-ada-002", api_key=st.secrets.openai_api_key)
-
-    return embeddings_model
-
-def load_cardiac_vector_store():
-    """
-    This function loads the "CARDIOLOGY" vector store from Qdrant server.
-    DOCKER DESKTOP needed to connect to Qdrant server!
-    Embeddings model needed to retrieve vectors in DENSE mode!
-
-    Returns:
-        - vector_store: Qdrant database
-    """
-
-    embeddings = openai_embeddings()
-
-    vector_store = QdrantVectorStore.from_existing_collection(
-            collection_name='cardiology',
-            embedding=embeddings,
-            retrieval_mode=RetrievalMode.DENSE,
-            prefer_grpc=False,
-            url="localhost:6333",
-            distance=Distance.COSINE,
-    )
-
-    return vector_store
-
-def load_nephro_vector_store():
-    """
-    This function loads the "NEPHROLOGY" vector store from Qdrant server.
-    DOCKER DESKTOP needed to connect to Qdrant server!
-    Embeddings model needed to retrieve vectors in DENSE mode!
-
-    Returns:
-        - vector_store: Qdrant database
-    """    
-  
-    embeddings = openai_embeddings()
-
-    vector_store = QdrantVectorStore.from_existing_collection(
-            collection_name='nephrology',
-            embedding=embeddings,
-            retrieval_mode=RetrievalMode.DENSE,
-            prefer_grpc=False,
-            url="localhost:6333",
-            distance=Distance.COSINE,
-    )
-
-    return vector_store
-
 def set_up_home_pages():
     """
     This function builds all the different pages and permissions, based on the user's role.
@@ -215,19 +172,25 @@ def set_up_home_pages():
     
     request_1 = st.Page(
         "pages/patient/peds_ai.py",
-        title="Pediatric AI",
+        title="Pediatric AI RAG Single Question",
+        icon=":material/help:",
+        )
+    
+    request_2 = st.Page(
+        "pages/patient/chatbot.py",
+        title="Pediatric AI RAG Chatbot",
         icon=":material/help:",
         )
 
     provider_1 = st.Page(
         "pages/provider/xray_ai.py",
-        title="X-Ray AI",
+        title="X-Ray AI Diagnostics",
         icon=":material/healing:",
     )
 
     provider_2 = st.Page(
         "pages/provider/assistant_ai.py",
-        title="Personal AI",
+        title="Personal AI RAG Model",
         icon=":material/info:",
     )
 
@@ -238,7 +201,7 @@ def set_up_home_pages():
     )
 
     account_pages = [settings, logout_page ]
-    patient_pages = [request_1]
+    patient_pages = [request_1, request_2]
     provider_pages = [provider_1, provider_2]
     admin_pages = [admin_1]
 
@@ -258,9 +221,15 @@ def set_up_home_pages():
 
 
     if len(page_dict) > 0:
-        pg = st.navigation(page_dict | {"Account": account_pages})
+        with st.sidebar:
+            API_KEY = st.text_input('type you OpenAI API KEY', placeholder='OpenAI API KEY', type='password')
+            st.session_state.open_ai_api_key = API_KEY
+
+            pg = st.navigation(page_dict | {"Account": account_pages})
     else:
         pg = st.navigation([st.Page(login)])
+
+
 
     pg.run()
 
@@ -274,28 +243,10 @@ def main():
     css = load_css("./styles/style.css")
     st.markdown(css, unsafe_allow_html=True)
 
-    # Initiate all the session variables
-    if "role" not in st.session_state:
-        st.session_state.role = None
-    if "user" not in st.session_state:
-        st.session_state.user = None
-    if "mrn" not in st.session_state:
-        st.session_state.mrn = None
-    if "last_name" not in st.session_state:
-        st.session_state.last_name = None
-    if "query" not in st.session_state:
-        st.session_state.query = None
-    if "query_id" not in st.session_state:
-        st.session_state.query_id = None
-    if 'collection' not in st.session_state:
-        st.session_state.collection = None
-    if 'vector_store_cards' not in st.session_state:
-        st.session_state.vector_store_cards = None
-    if 'vector_store_nephro' not in st.session_state:
-        st.session_state.vector_store_nephro = None
 
     # Build the pages for the app
     set_up_home_pages()
+
 
 ## Initialize the app ##
 if __name__ == "__main__":

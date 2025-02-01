@@ -8,6 +8,8 @@ from PIL import Image
 def set_up_page():
     """ Set up the header for the page"""
     st.header("Computer Vision: X-Ray Classifier")
+    st.info("""This program uses Computer Vision and Convolutional Neural Networks (CNN) to predict is there is a fracture in the X-Ray image.
+            \n The Machine Learning model was built using Tensorflow and trained with 3000 X-ray images.\n """)
 
 def load_model():
     """
@@ -63,10 +65,11 @@ def predict_fracture(preprocessed_image, model):
 
     # Interpret the result
     if prediction[0] > 0.75:
-        return f"Fractured, {prediction[0]*100} %" 
-    else:
-        return f"Not Fractured, {prediction[0]*100} %"
-
+        return f"Fractured, {int(prediction[0]*100)} %" 
+    elif prediction[0] < 0.25:
+        return f"Not Fractured, {int(prediction[0]*100)} %"
+    else: 
+        return f"Inconclusive diagnosis with {int(prediction[0]*100)} % possibility of fracture... \n Please check with Radiologist"
 def main():
 
     model = load_model()
@@ -83,7 +86,7 @@ def main():
             result = predict_fracture(preprocessed_image, model)
 
             # Display the prediction result
-            st.markdown(f"### Prediction: {result}")
+            st.markdown(f"##### Prediction: {result}")
 
             # Display the uploaded image
             st.image(uploaded_img, caption=f"Prediction: {result}", use_container_width=False, width=500)
