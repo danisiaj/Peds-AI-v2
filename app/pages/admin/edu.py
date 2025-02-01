@@ -36,10 +36,11 @@ def pymysql_connection():
     """
 
     return pymysql.connect(
-        host=RDS_ENDPOINT,  
-        user='remote_user',  
-        password=MYSQL_PASSWORD,  
-        database='nurses_data'  
+        host=st.secrets["mysql"]["endpoint"],  
+        user=st.secrets["mysql"]["user"],      
+        password=st.secrets["mysql"]["sql_password"], 
+        database=st.secrets["mysql"]["database"],  
+        port=st.secrets["mysql"]["port"]  
     )
 
 def load_queries_database():
