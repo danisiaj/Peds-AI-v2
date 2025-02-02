@@ -7,7 +7,6 @@ from openai import OpenAI
 
 ## OpenAI API KEY ##
 API_KEY = st.session_state.open_ai_api_key
-st.write(st.secrets)
 
 
 # MYSQL_PASSWORD = st.secrets.sql_password
