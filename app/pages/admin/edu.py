@@ -35,11 +35,11 @@ def pymysql_connection():
     """
     try:
         connection = pymysql.connect(
-            host="your_host",
-            user="your_user",
-            password="your_password",
-            database="your_database",
-            port=3306  # Change if necessary
+        endpoint = "nurses.cngouckso452.eu-north-1.rds.amazonaws.com",
+        sql_user = 'admin',
+        sql_password = '00000000',   
+        database = 'nurses_data',
+        port = 3306 
         )
         print("Connection successful!")
         return connection
