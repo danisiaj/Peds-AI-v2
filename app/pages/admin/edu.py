@@ -7,7 +7,7 @@ from openai import OpenAI
 
 ## OpenAI API KEY ##
 API_KEY = st.session_state.open_ai_api_key
-SQL_HOST = st.secrets.host
+SQL_HOST = st.secrets.sql_host
 
 # MYSQL_PASSWORD = st.secrets.sql_password
 
