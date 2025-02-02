@@ -33,14 +33,18 @@ def pymysql_connection():
     """
     This function starts the connection with MySQL for data analytics
     """
-
-    return pymysql.connect(
-        host = "nurses.cngouckso452.eu-north-1.rds.amazonaws.com",
-        user='admin',      
-        password='00000000', 
-        database='nurses_data',  
-        port=3306 
-    )
+    try:
+        connection = pymysql.connect(
+            host="your_host",
+            user="your_user",
+            password="your_password",
+            database="your_database",
+            port=3306  # Change if necessary
+        )
+        print("Connection successful!")
+        return connection
+    except pymysql.MySQLError as e:
+        print("Error:", e)
 
 def load_queries_database():
     """
