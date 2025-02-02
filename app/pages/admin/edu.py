@@ -8,7 +8,7 @@ from openai import OpenAI
 ## OpenAI API KEY ##
 API_KEY = st.session_state.open_ai_api_key
 st.write(st.secrets)
-SQL_HOST = st.secrets.sql_host
+
 
 # MYSQL_PASSWORD = st.secrets.sql_password
 
@@ -38,11 +38,11 @@ def pymysql_connection():
     """
     try:
         connection = pymysql.connect(
-        host = SQL_HOST,
-        user = 'admin',
-        password = '00000000',   
-        database = 'nurses_data',
-        port = 3306 
+        host = st.secrets.sql_host,
+        user = st.secrets.sql_user,
+        password = st.secrets.sql_password,   
+        database = st.secrets.database,
+        port = st.secrets.port 
         )
         print("Connection successful!")
         return connection
