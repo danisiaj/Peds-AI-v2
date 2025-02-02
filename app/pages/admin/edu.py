@@ -7,6 +7,8 @@ from openai import OpenAI
 
 ## OpenAI API KEY ##
 API_KEY = st.session_state.open_ai_api_key
+SQL_HOST = st.secrets.host
+
 # MYSQL_PASSWORD = st.secrets.sql_password
 
 ## Define the functions ##
@@ -35,7 +37,7 @@ def pymysql_connection():
     """
     try:
         connection = pymysql.connect(
-        host = "nurses.cngouckso452.eu-north-1.rds.amazonaws.com",
+        host = SQL_HOST,
         user = 'admin',
         password = '00000000',   
         database = 'nurses_data',
