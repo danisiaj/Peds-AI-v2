@@ -1,7 +1,7 @@
 import streamlit as st
 from openai import OpenAI
 from langchain_openai import OpenAIEmbeddings
-from langchain_qdrant import QdrantVectorStore, RetrievalMode
+from langchain_qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams
 from langchain.schema import Document
