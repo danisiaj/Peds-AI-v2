@@ -212,7 +212,7 @@ def set_up_home_pages():
     #st.logo(image="images/logo_3_copy.png", icon_image="images/Logo.png")
 
     page_dict = {}
-    if st.session_state.role == ['Patient | Family']:
+    if st.session_state.role == 'Patient | Family':
         page_dict["Patient"] = patient_pages
     if st.session_state.role == 'Provider':
         page_dict["Patient"] = patient_pages
