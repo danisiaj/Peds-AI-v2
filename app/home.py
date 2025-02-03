@@ -58,8 +58,12 @@ def login():
             \n YOU WILL NEED YOUR OPENAI API KEY!""")
     status = False
     st.subheader("Log in")
-    role = st.selectbox("   Choose your role", ROLES)
 
+    API_KEY = st.text_input('type you OpenAI API KEY', placeholder='OpenAI API KEY', type='password')
+    st.session_state.open_ai_api_key = API_KEY
+    
+    role = st.selectbox("   Choose your role", ROLES)
+        
     if role == None:
         pass
 
@@ -88,8 +92,7 @@ def login():
         else:
             pass
 
-    API_KEY = st.text_input('type you OpenAI API KEY', placeholder='OpenAI API KEY', type='password')
-    st.session_state.open_ai_api_key = API_KEY
+    
     col1, col2, col3 = st.columns([1,2,6])
     with col1:
         if st.button("Log in"):
@@ -229,7 +232,11 @@ def set_up_home_pages():
 
 
     if len(page_dict) > 0:
-        pg = st.navigation(page_dict | {"Account": account_pages})
+        with st.sidebar:
+            API_KEY = st.text_input('type you OpenAI API KEY', placeholder='OpenAI API KEY', type='password')
+            st.session_state.open_ai_api_key = API_KEY
+
+            pg = st.navigation(page_dict | {"Account": account_pages})
     else:
         pg = st.navigation([st.Page(login)])
 
