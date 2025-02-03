@@ -234,6 +234,8 @@ def set_up_home_pages():
 
 
     if len(page_dict) > 0:
+        pg = st.navigation(page_dict | {"Account": account_pages})
+
         with st.sidebar:
             if st.session_state.open_ai_api_key == None:
                 API_KEY = st.text_input('type you OpenAI API KEY', placeholder='OpenAI API KEY', type='password')
@@ -242,7 +244,6 @@ def set_up_home_pages():
                 API_KEY = st.session_state.open_ai_api_key
                 return API_KEY
 
-        pg = st.navigation(page_dict | {"Account": account_pages})
     else:
         pg = st.navigation([st.Page(login)])
 
