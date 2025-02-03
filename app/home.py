@@ -53,7 +53,7 @@ def login():
             \n Peds AI adds different features depending WHO is logging in, giving special priviledges to Educators and Administrators.
             \n Login info:\n 
                 username/last name = 'user'
-                password/MRN = 12345
+            password/MRN = 12345
             \n Enjoy!       
             \n YOU WILL NEED YOUR OPENAI API KEY!""")
     status = False
