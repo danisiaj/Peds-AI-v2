@@ -46,8 +46,9 @@ def login():
 
     ST.SECRETS NEEDED!!
     """
-    st.info("""
-        This APP integrates almost all the concepts learned in my Data Science & Machine Learning Bootcamp through IronHack.
+    with st.expander(label='Log in instructions')
+                
+        st.write("""This APP integrates almost all the concepts learned in my Data Science & Machine Learning Bootcamp through IronHack.
             \n Peds AI App was created by a nurse who works in a Pediatric Cardiology Floor in the hospital. The goal of the app is to enhance education for patients, family members and providers. 
             \n Peds AI adds different features depending WHO is logging in, giving special priviledges to Educators and Administrators.
             \n Login info: username/last name = 'user' ; password/MRN = 12345
