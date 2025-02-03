@@ -96,10 +96,10 @@ def set_up_page():
     st.header('Peds Cardiology Chatbot')
     with st.expander('Explanation'):
         st.info("""Langchain RAG Model AI Assistant:\n
-            \n \ta. Data: Pediatric Cardiology The Essential Pocket Guide. Rights reserved*
-            \n \tb. Embeddings: Open AI Embeddings
-            \n \tc. Database: Qdrant Cloud Vector Store  
-            \n \td. LLM: Open AI\n
+            \n \tData: Pediatric Cardiology The Essential Pocket Guide. Rights reserved*
+            \n \tEmbeddings: Open AI Embeddings
+            \n \tDatabase: Qdrant Cloud Vector Store  
+            \n \tLLM: Open AI\n
             \n\n AI CHATBOT to answer questions about Pediatric Cardiology. 
                 User's queries will be store using MySQL for further analysis.
             """, 
