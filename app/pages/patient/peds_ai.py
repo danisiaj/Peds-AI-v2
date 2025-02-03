@@ -94,7 +94,7 @@ def set_up_page():
     """
 
     st.header('Multimodal RAG: Pediatric AI')
-    st.info("make sure to type your OpenAI API Key in the sidebar. '>' symbol on the top left corner.")
+    st.warning("Make sure to type your OpenAI API Key in the sidebar. '>' symbol on the top left corner.")
     with st.expander('Explanation'):
         st.info("""Langchain RAG Model AI Assistant:\n
             \n \tData: Pediatric Cardiology The Essential Pocket Guide. Rights reserved*
