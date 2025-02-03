@@ -22,8 +22,6 @@ if 'vector_store_cards' not in st.session_state:
     st.session_state.vector_store_cards = None
 if 'cardiac_defect' not in st.session_state:
     st.session_state.cardiac_defect = None
-if 'open_ai_api_key' not in st.session_state:
-    st.session_state.open_ai_api_key = None
 
 
 
@@ -60,12 +58,8 @@ def login():
             \n YOU WILL NEED YOUR OPENAI API KEY!""")
     status = False
     st.subheader("Log in")
-
-    API_KEY = st.text_input('type you OpenAI API KEY', placeholder='OpenAI API KEY', type='password')
-    st.session_state.open_ai_api_key = API_KEY
-
     role = st.selectbox("   Choose your role", ROLES)
-        
+
     if role == None:
         pass
 
@@ -234,16 +228,11 @@ def set_up_home_pages():
 
 
     if len(page_dict) > 0:
-        pg = st.navigation(page_dict | {"Account": account_pages})
-
         with st.sidebar:
-            if st.session_state.open_ai_api_key == None:
-                API_KEY = st.text_input('type you OpenAI API KEY', placeholder='OpenAI API KEY', type='password')
-                st.session_state.open_ai_api_key = API_KEY
-            else: 
-                API_KEY = st.session_state.open_ai_api_key
-                return API_KEY
+            API_KEY = st.text_input('type you OpenAI API KEY', placeholder='OpenAI API KEY', type='password')
+            st.session_state.open_ai_api_key = API_KEY
 
+            pg = st.navigation(page_dict | {"Account": account_pages})
     else:
         pg = st.navigation([st.Page(login)])
 
