@@ -18,8 +18,8 @@ def set_up_page():
 
     st.header("MySQL: Education Center")
     st.info("""This service provides access a database in MySQL that contains:
-            \n 1. Personal, Work and Education information about the nursing team.
-            \n 2. The queries/questions made by the users in the Pediatric AI RAG models.""")
+            \n Tab 1. Personal, Work and Education information about the nursing team.
+            \n Tab 2. The queries/questions made by the users in the Pediatric AI RAG models.""")
     
 def load_data():
     """
