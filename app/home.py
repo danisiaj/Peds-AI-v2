@@ -242,7 +242,7 @@ def set_up_home_pages():
                 API_KEY = st.session_state.open_ai_api_key
                 return API_KEY
 
-            pg = st.navigation(page_dict | {"Account": account_pages})
+        pg = st.navigation(page_dict | {"Account": account_pages})
     else:
         pg = st.navigation([st.Page(login)])
 
