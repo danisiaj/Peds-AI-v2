@@ -97,9 +97,9 @@ def set_up_page():
     with st.expander('Explanation'):
         st.info("""Langchain RAG Model AI Assistant:\n
             \n      a. Data: Pediatric Cardiology The Essential Pocket Guide. Rights reserved*
-            \n      b. Embeddings: Open AI Embeddings
-            \n      c. Database: Qdrant Cloud Vector Store
-            \n      d. LLM: Open AI\n
+            \nb. Embeddings: Open AI Embeddings
+            \nc. Database: Qdrant Cloud Vector Store
+            \nd. LLM: Open AI
             \n\n AI CHATBOT to answer questions about Pediatric Cardiology. 
                 User's queries will be store using MySQL for further analysis.
             """, 
