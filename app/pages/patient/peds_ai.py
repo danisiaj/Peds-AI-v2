@@ -94,9 +94,16 @@ def set_up_page():
     """
 
     st.header('Multimodal RAG: Pediatric AI')
-    st.info("""This RAG model uses Qdrant Cloud and Open AI 
-        to create an intelligent assistant to answer questions about Pediatric Cardiology. 
-        The vector database was built using OpenAI Embeddings to store the book Pediatric Cardiology The Essential Pocket Guide.""", 
+    st.info("make sure to type your OpenAI API Key in the sidebar. '>' symbol on the top left corner.")
+    with st.expander('Explanation'):
+        st.info("""Langchain RAG Model AI Assistant:\n
+            \n \tData: Pediatric Cardiology The Essential Pocket Guide. Rights reserved*
+            \n \tEmbeddings: Open AI Embeddings
+            \n \tDatabase: Qdrant Cloud Vector Store  
+            \n \tLLM: Open AI\n
+            \n\n AI Assistant to answer questions about Pediatric Cardiology and evaluate the response. 
+                User's queries will be stored using MySQL for further analysis.
+            """, 
         icon="ℹ️")
     col1, col2, = st.columns([1,1])
     with col1:

@@ -101,7 +101,7 @@ def set_up_page():
             \n \tDatabase: Qdrant Cloud Vector Store  
             \n \tLLM: Open AI\n
             \n\n AI CHATBOT to answer questions about Pediatric Cardiology. 
-                User's queries will be store using MySQL for further analysis.
+                User's queries will be stored using MySQL for further analysis.
             """, 
         icon="ℹ️")
     col1, col2, = st.columns([1,1])
