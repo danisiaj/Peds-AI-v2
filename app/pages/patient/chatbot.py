@@ -96,8 +96,8 @@ def set_up_page():
     st.header('Peds Cardiology Chatbot')
     with st.expander('Explanation'):
         st.info("""Langchain RAG Model AI Assistant:\n
-            \n \t\bData:\b Pediatric Cardiology The Essential Pocket Guide. Rights reserved*
-            \n \t\bEmbeddings:\b Open AI Embeddings
+            \n \tData: Pediatric Cardiology The Essential Pocket Guide. Rights reserved*
+            \n \tEmbeddings: Open AI Embeddings
             \n \tDatabase: Qdrant Cloud Vector Store  
             \n \tLLM: Open AI\n
             \n\n AI CHATBOT to answer questions about Pediatric Cardiology. 
