@@ -106,7 +106,6 @@ def set_up_page():
 
     return collection, language
 
-
 ##### 2. Functions to generate the prompt and retrieve the answer from our LLM #####
 
 # User query function
