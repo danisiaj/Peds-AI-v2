@@ -52,8 +52,8 @@ def login():
             \n Peds AI App was created by a nurse who works in a Pediatric Cardiology Floor in the hospital. The goal of the app is to enhance education for patients, family members and providers. 
             \n Peds AI adds different features depending WHO is logging in, giving special priviledges to Educators and Administrators.
             \n Login info:\n 
-    username/last name = 'user' 
-    password/MRN = 12345
+            username/last name = 'user' 
+            password/MRN = 12345
             \n Enjoy!       
             \n YOU WILL NEED YOUR OPENAI API KEY!""")
     status = False
