@@ -22,7 +22,7 @@ if 'vector_store_cards' not in st.session_state:
     st.session_state.vector_store_cards = None
 if 'cardiac_defect' not in st.session_state:
     st.session_state.cardiac_defect = None
-if 'openai_api_key' not in st.session_state:
+if 'open_ai_api_key' not in st.session_state:
     st.session_state.open_ai_api_key = None
 
 
