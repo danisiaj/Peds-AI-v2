@@ -49,7 +49,7 @@ def login():
     with st.expander(label='Log in instructions'):
                 
         st.info("""
-                Login info:\n 
+                testtttttLogin info:\n 
     username/last name = user 
     password/MRN = 12345
                 This APP integrates almost all the concepts learned in my Data Science & Machine Learning Bootcamp through IronHack.
