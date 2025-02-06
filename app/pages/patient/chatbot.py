@@ -8,6 +8,10 @@ import time
 from openai import OpenAI
 from uuid import uuid4
 import json
+from langchain_openai import OpenAIEmbeddings
+from langchain_qdrant import QdrantVectorStore, RetrievalMode
+from qdrant_client import QdrantClient
+from qdrant_client.http.models import Distance
 
 
 COLLECTIONS = ['Cardiology']
@@ -15,7 +19,6 @@ LANGUAGES = ['English', 'Spanish']
 
 # API KEY from OpenAI
 API_KEY = st.secrets.openai_api_key
-
 
 # Initiliaze Open AI
 def client_openai_init():
@@ -30,9 +33,52 @@ def client_openai_init():
 
     return client_openai
 
+def openai_embeddings():
+    """
+    This function builds the embeddings function using the OpenAI API
 
+    Returns: 
+        - embedding_model, embedding function from OpenAI
+    """
 
+    # Embeddings object from OpenAI
+    embeddings_model = OpenAIEmbeddings(model="text-embedding-ada-002", api_key=API_KEY)
 
+    return embeddings_model
+
+# Initialize Qdrant Client
+def qdrant_client_init():
+    """
+    This function initializes the Qdrant object
+    """
+    qdrant_client = QdrantClient(
+        url=st.secrets.qdrant_cloud_url,
+        api_key=st.secrets.qdrant_API_KEY    
+    )
+
+    return qdrant_client
+
+def load_cardiac_vector_store():
+    """
+    Loads or retrieves the Qdrant vector store for the cardiology dataset.
+
+    Returns:
+        - vector_store: Qdrant database
+    """
+
+    embeddings = openai_embeddings()
+
+    db = QdrantVectorStore.from_existing_collection(
+        collection_name="peds_cardiology",
+        embedding=embeddings,
+        retrieval_mode=RetrievalMode.DENSE,
+        prefer_grpc=False,
+        distance=Distance.COSINE,
+        location=st.secrets.qdrant_cloud_url,
+        api_key=st.secrets.qdrant_API_KEY
+    )
+
+    return db
 ##### 1. Set up Page #####
 
 # Function to print the header of the page
@@ -40,7 +86,6 @@ def set_up_page():
     """
     This function sets up the header of the page Peds AI
     """
-
     return st.subheader('Peds Cards AI')
 
 ##### 2. Functions to generate the prompt and retrieve the answer from our LLM #####
@@ -339,7 +384,8 @@ def main():
 
     set_up_page()
     client_openai = client_openai_init()
-    db = st.session_state.db
+    db = load_cardiac_vector_store()
+    
     collection = 'Cardiology' 
     st.session_state.collection = collection
     
