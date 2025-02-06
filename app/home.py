@@ -131,16 +131,17 @@ def login():
     elif role != None:
         user = st.text_input(" Your name", placeholder="Your name")
         col1, col2, col3 = st.columns([1,2,6])
-        with col1:
-            if st.button("Start"):
-                st.session_state.role = role
-                st.session_state.user = user
-                with col2:
-                    with st.spinner('Loading Qdrant Vectorstore...'):
-                        database = load_cardiac_vector_store()
-                        st.session_state.db = database
-                
-                st.rerun()   
+        if user != None:
+            with col1:
+                if st.button("Start"):
+                    st.session_state.role = role
+                    st.session_state.user = user
+                    with col2:
+                        with st.spinner('Loading Qdrant Vectorstore...'):
+                            database = load_cardiac_vector_store()
+                            st.session_state.db = database
+                    
+                    st.rerun()   
 
 ### THIS CODE IS TO APPLY USER AND PASSWROD SECURITY TO THE APP ###
 
