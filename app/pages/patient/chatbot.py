@@ -45,7 +45,7 @@ def set_up_page():
         - collection: str
     """
 
-    st.subheader('Peds Cardiology Chatbot')
+    st.subheader('Peds Cards AI')
     with st.expander('Explanation'):
         st.info("""Langchain RAG Model AI Assistant:\n
             \n \tData: Pediatric Cardiology The Essential Pocket Guide. Rights reserved*
