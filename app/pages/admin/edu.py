@@ -351,7 +351,7 @@ def query_history():
             new_row = pd.DataFrame([{
                                 'user': st.session_state.user, 
                                 'question': st.session_state.query,
-                                'topic':st.session_state.collection,
+                                #'topic':st.session_state.collection,
                                 'role':st.session_state.role
                                 }])
             user_queries = pd.concat([st.session_state.user_queries, new_row], ignore_index=True)
