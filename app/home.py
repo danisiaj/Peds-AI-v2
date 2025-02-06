@@ -291,7 +291,7 @@ def set_up_home_pages():
 
     account_pages = [logout_page ]
     patient_pages = [request_1, request_2]
-    provider_pages = [provider_1, provider_2]
+    #provider_pages = [provider_1, provider_2]
     admin_pages = [admin_1]
 
     st.logo(image="app/images/chat-logo.png", icon_image="app/images/chat-logo.png")
