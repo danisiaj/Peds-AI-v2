@@ -109,9 +109,16 @@ def login():
     """
     with st.expander(label='Learn more about this app'):
                 
-        st.info("""
-            \nThis APP integrates almost all the concepts learned in my Data Science & Machine Learning Course.
-            \n Peds AI App was created by a nurse who works in a Pediatric Cardiology Floor in the hospital. The goal of the app is to enhance education for patients, family members and providers. 
+        st.info("""Peds AI App was created by a nurse who works in a Pediatric Cardiology Floor in the hospital.
+                The goal of the app is to enhance education for patients, family members and providers.\n
+            \nAI CHATBOT to answer questions about Pediatric Cardiology.
+                \nLangchain RAG Model AI Assistant:\n
+            \n \tData: Pediatric Cardiology The Essential Pocket Guide. Rights reserved*
+            \n \tEmbeddings: Open AI Embeddings
+            \n \tDatabase: Qdrant Cloud Vector Store  
+            \n \tLLM: Open AI\n
+              
+            \nUser's queries will be stored using MySQL for further analysis.
             \n Peds AI adds different features depending what ROLE the user chooses, giving special priviledges to Educators and Administrators.
 
             \n Enjoy!

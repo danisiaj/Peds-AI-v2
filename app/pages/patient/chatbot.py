@@ -46,17 +46,6 @@ def set_up_page():
     """
 
     st.subheader('Peds Cards AI')
-    with st.expander('Explanation'):
-        st.info("""Langchain RAG Model AI Assistant:\n
-            \n \tData: Pediatric Cardiology The Essential Pocket Guide. Rights reserved*
-            \n \tEmbeddings: Open AI Embeddings
-            \n \tDatabase: Qdrant Cloud Vector Store  
-            \n \tLLM: Open AI\n
-            \n\n AI CHATBOT to answer questions about Pediatric Cardiology. 
-                User's queries will be stored using MySQL for further analysis.
-            """, 
-        icon="ℹ️")
-
     language = st.selectbox("   Choose your language", LANGUAGES) 
 
  
