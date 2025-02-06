@@ -290,7 +290,7 @@ def set_up_home_pages():
     provider_pages = [provider_1, provider_2]
     admin_pages = [admin_1]
 
-    st.logo(image="./images/chat-logo.png", icon_image="./images/chat-logo.png")
+    st.logo(image="app/images/chat-logo.png", icon_image="app/images/chat-logo.png")
 
     page_dict = {}
     if st.session_state.role == 'Patient | Family':
