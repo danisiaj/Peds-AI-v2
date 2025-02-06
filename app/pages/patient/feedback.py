@@ -40,7 +40,7 @@ def store_feedback_query(df):
     # Upload DataFrames to SQL using pymysql connection
     try:
         with connection.cursor() as cursor:
-            # Insert data into user_questions table
+            # Insert data into user_feedback table
             queries_columns = ', '.join(df.columns)
 
             for index, row in df.iterrows():
@@ -71,11 +71,5 @@ def main():
             }])
             store_feedback_query(new_row)
             st.success("Thank you so much for your feedback!")
-            st.rerun()
-
-
-
-
-
 
 main()
