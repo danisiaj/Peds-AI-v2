@@ -56,15 +56,24 @@ def store_feedback_query(df):
         connection.close() 
 
 def main():
-    feedback = st.text_area(label="Did you enjoy it? What can we do better?", placeholder="type your feedback here")
+    feedback = st.text_area(
+        label="Did you enjoy it? What can we do better?", 
+        placeholder="Type your feedback here", 
+        key="feedback"
+    )
+
     if st.button("Submit feedback"):
-        new_row = pd.DataFrame([{
-                                'user': st.session_state.user, 
-                                'feedback': feedback,
-                                'role':st.session_state.role
-                                }])
-        store_feedback_query(new_row)
-        st.success("Thank you so much for your feedback!")
-            
+        if feedback:  
+            new_row = pd.DataFrame([{
+                'user': st.session_state.user, 
+                'feedback': feedback,
+                'role': st.session_state.role
+            }])
+            store_feedback_query(new_row)
+            st.success("Thank you so much for your feedback!")
+
+            # Clear text area after submission
+            st.session_state.feedback = ""
+
 
 main()
