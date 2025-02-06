@@ -122,12 +122,9 @@ def login():
             \n Peds AI adds different features depending what ROLE the user chooses, giving special priviledges to Educators and Administrators.
 
             \n Enjoy!
-        """)       
-    status = False
-    st.subheader("Start")
+        """)
+
     role = st.selectbox("   Choose your role", ROLES)
-
-
     if role == None:
         pass
 
