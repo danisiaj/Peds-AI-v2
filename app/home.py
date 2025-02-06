@@ -266,8 +266,8 @@ def set_up_home_pages():
         )
     
     request_2 = st.Page(
-        "pages/patient/peds_ai.py",
-        title="Pediatric AI RAG Single Question",
+        "pages/patient/feedback.py",
+        title="Give us feedback",
         icon=":material/help:",
         )
 
@@ -290,7 +290,7 @@ def set_up_home_pages():
     )
 
     account_pages = [logout_page ]
-    patient_pages = [request_1]
+    patient_pages = [request_1, request_2]
     provider_pages = [provider_1, provider_2]
     admin_pages = [admin_1]
 

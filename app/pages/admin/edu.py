@@ -40,7 +40,7 @@ def pymysql_connection():
         host = st.secrets.sql_host,
         user = st.secrets.sql_user,
         password = st.secrets.sql_password,   
-        database = st.secrets.database,
+        database = st.secrets.database_nurses,
         port = st.secrets.port 
         )
         print("Connection successful!")
