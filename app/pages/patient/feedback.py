@@ -1,5 +1,6 @@
 import streamlit as st
 import pymysql
+import pandas as pd
 
 if 'feedback' not in st.session_state:
     st.session_state.feedback = None
@@ -57,7 +58,12 @@ def store_feedback_query(df):
 def main():
     feedback = st.text_area(label="Did you enjoy it? What can we do better?", placeholder="type your feedback here")
     if st.button("Submit feedback"):
-        st.session_state.feedback = feedback
-        store_feedback_query()
+        new_row = pd.DataFrame([{
+                                'user': st.session_state.user, 
+                                'feedback': feedback,
+                                'role':st.session_state.role
+                                }])
+        
+        store_feedback_query(new_row)
 
 main()
