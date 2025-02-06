@@ -358,7 +358,6 @@ def main():
         new_row = pd.DataFrame([{
                 'user': st.session_state.user, 
                 'question': st.session_state.query,
-                #'topic':st.session_state.collection,
                 'role':st.session_state.role
                 }])
         store_user_question(new_row)
