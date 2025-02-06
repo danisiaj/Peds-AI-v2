@@ -18,8 +18,7 @@ COLLECTIONS = ['Cardiology']
 LANGUAGES = ['English', 'Spanish']
 
 # API KEY from OpenAI
-#API_KEY = st.secrets.openai_api_key
-API_KEY = st.session_state.open_ai_api_key
+API_KEY = st.secrets.openai_api_key
 
 
 # Initiliaze Open AI
