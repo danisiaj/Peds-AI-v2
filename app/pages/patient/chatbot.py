@@ -198,7 +198,7 @@ def get_document_context(docs):
     return context
 
 # Dynamic prompt function
-def generate_prompt_from_user_query(query, docs, collection, language):
+def generate_prompt_from_user_query(role, query, docs, collection, language):
     """
     This functions uses a template to generate a dynamic prompt that can be adapted to the user's query
 
@@ -209,7 +209,7 @@ def generate_prompt_from_user_query(query, docs, collection, language):
     INTRODUCTION
     You are an expert virtual assistant specializing in pediatric {collection}. Your role is to provide clear, step-by-step answers to questions about medical protocols, required materials, and procedural guidelines relevant to pediatric cardiology nursing practices. Your responses should be informative, precise, and formatted in Markdown.
 
-    The user asked: "{query}"
+    If the user is a {role} and they asked: "{query}"
 
     CONTEXT
     Pediatric {collection}:
@@ -268,7 +268,7 @@ def get_response_from_client(prompt, client_openai):
     return answer
 
 # COMBINE THE PREVIOUS FUNCTIONS
-def get_response(db, query, client_openai, collection, language):
+def get_response(role, db, query, client_openai, collection, language):
     """
     This function takes the vector store (with embeddings) and the query from the user
     and applies the different functions to retrieve the data relevant to the query,
@@ -280,7 +280,7 @@ def get_response(db, query, client_openai, collection, language):
     """
 
     docs = perform_similarity_search(query, db)
-    prompt = generate_prompt_from_user_query(query, docs, collection, language)
+    prompt = generate_prompt_from_user_query(role, query, docs, collection, language)
     answer = get_response_from_client(prompt, client_openai)
 
     return answer
@@ -433,7 +433,8 @@ def main():
             st.markdown(query)
 
         with st.chat_message(name="assistant", avatar='app/images/chat-logo.png'):
-            answer = get_response(db, query, client_openai, collection, language) 
+            role = st.session_state.role
+            answer = get_response(role, db, query, client_openai, collection, language) 
             st.write_stream(stream_data(answer))        
         st.session_state.messages.append({"role": "assistant", "content": answer})
     
