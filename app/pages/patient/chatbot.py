@@ -288,6 +288,53 @@ def get_evaluation_from_LLM_as_a_judge(client_openai, prompt_for_eval):
 
     return evaluation_dict
 
+def pymysql_connection():
+    """
+    This function starts the connection with MySQL for data analytics
+    """
+    try:
+        connection = pymysql.connect(
+        host = st.secrets.sql_host,
+        user = st.secrets.sql_user,
+        password = st.secrets.sql_password,   
+        database = st.secrets.database_nurses,
+        port = st.secrets.port 
+        )
+        print("Connection successful!")
+        return connection
+    except pymysql.MySQLError as e:
+        print("Error:", e)
+
+def store_user_question(df):
+    """
+    This function takes the dataframe with all the questions from the users and update the database in MyQSL
+    *** QUESTIONS COME FROM THE PEDS_AI PAGE
+
+    Arguments:
+        - db_config: dict, information to connect to MySQL
+    """
+
+    # Establish connection
+    connection = pymysql_connection()
+
+    # Upload DataFrames to SQL using pymysql connection
+    try:
+        with connection.cursor() as cursor:
+            # Insert data into user_questions table
+            queries_columns = ', '.join(df.columns)
+
+            for index, row in df.iterrows():
+                query_store_queries = f"INSERT INTO user_questions ({queries_columns}) VALUES ({', '.join(['%s'] * len(df.columns))})"
+                cursor.execute(query_store_queries, tuple(row))
+            
+            # Commit the transaction
+            connection.commit()
+            print("DataFrames uploaded successfully.")
+    except Exception as e:
+        print("Error while uploading DataFrames:", e)
+    finally:
+        connection.close() 
+
 def main():
 
     set_up_page()
@@ -308,6 +355,13 @@ def main():
 
     if query := st.chat_input("Ask something..."):
         st.session_state.query = query # Stores query into current session for later use of the data
+        new_row = pd.DataFrame([{
+                'user': st.session_state.user, 
+                'question': st.session_state.query,
+                #'topic':st.session_state.collection,
+                'role':st.session_state.role
+                }])
+        store_user_question(new_row)
 
         st.session_state.messages.append({"role": "user", "content": query})
         with st.chat_message(name="user", avatar='app/images/user-logo.png'):
