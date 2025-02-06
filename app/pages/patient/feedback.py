@@ -59,3 +59,5 @@ def main():
     if st.button("Submit feedback"):
         st.session_state.feedback = feedback
         store_feedback_query()
+
+main()
