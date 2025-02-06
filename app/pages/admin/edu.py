@@ -59,7 +59,7 @@ def load_queries_database():
     connection = pymysql_connection()
     cursor = connection.cursor()
 
-    cursor.execute('SELECT * FROM user_questions;')
+    cursor.execute('SELECT id, user, question, role FROM user_questions;')
 
     results = cursor.fetchall()
 
