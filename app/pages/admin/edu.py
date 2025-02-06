@@ -386,6 +386,8 @@ def main():
         if queries_password == st.secrets.queries_password:
             if access:
                 query_history()
+            else:
+                pass
         
 
 
