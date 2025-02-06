@@ -65,7 +65,6 @@ def main():
                                 }])
         store_feedback_query(new_row)
         st.success("Thank you so much for your feedback!")
-        st.rerun()
             
 
 main()
