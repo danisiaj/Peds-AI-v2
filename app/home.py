@@ -1,5 +1,11 @@
 ## Import necessary librries ##
 import streamlit as st
+from langchain_openai import OpenAIEmbeddings
+from langchain_qdrant import QdrantVectorStore, RetrievalMode
+from qdrant_client import QdrantClient
+from qdrant_client.http.models import Distance
+from openai import OpenAI
+
 
 ## Define the differnt roles for the user ##
 ROLES = [None, "Patient | Family", "Provider", "Educator | Admin"]
@@ -18,27 +24,79 @@ if 'user_queries' not in st.session_state:
     st.session_state.user_queries = None
 if 'collection' not in st.session_state:
     st.session_state.collection = None
-if 'vector_store_cards' not in st.session_state:
-    st.session_state.vector_store_cards = None
+if 'db' not in st.session_state:
+    st.session_state.db = None
 if 'cardiac_defect' not in st.session_state:
     st.session_state.cardiac_defect = None
-if 'messages' not in st.session_state:
-    st.session_state.messages = []
+
 
 
 
 
 ## Define all the functions ##
-def load_css(file_name):
-    """
-    This function calls the CSS file to set up the design of the app
+# API KEY from OpenAI
+API_KEY = st.secrets.openai_api_key
 
-    Arguments:
-        - file_name: str, path to the styles.css file
+
+# Initiliaze Open AI
+def client_openai_init():
+    """
+    This function initializes the OpenAI API with the user's API KEY
+
+    Returns: 
+        - client_open, connection with OpenAI API
     """
 
-    with open(file_name) as f:
-        return f"<style>{f.read()}</style>"
+    client_openai = OpenAI(api_key=API_KEY)
+
+    return client_openai
+
+def openai_embeddings():
+    """
+    This function builds the embeddings function using the OpenAI API
+
+    Returns: 
+        - embedding_model, embedding function from OpenAI
+    """
+
+    # Embeddings object from OpenAI
+    embeddings_model = OpenAIEmbeddings(model="text-embedding-ada-002", api_key=API_KEY)
+
+    return embeddings_model
+
+# Initialize Qdrant Client
+def qdrant_client_init():
+    """
+    This function initializes the Qdrant object
+    """
+    qdrant_client = QdrantClient(
+        url=st.secrets.qdrant_cloud_url,
+        api_key=st.secrets.qdrant_API_KEY    
+    )
+
+    return qdrant_client
+
+def load_cardiac_vector_store():
+    """
+    Loads or retrieves the Qdrant vector store for the cardiology dataset.
+
+    Returns:
+        - vector_store: Qdrant database
+    """
+
+    embeddings = openai_embeddings()
+
+    db = QdrantVectorStore.from_existing_collection(
+        collection_name="peds_cardiology",
+        embedding=embeddings,
+        retrieval_mode=RetrievalMode.DENSE,
+        prefer_grpc=False,
+        distance=Distance.COSINE,
+        location=st.secrets.qdrant_cloud_url,
+        api_key=st.secrets.qdrant_API_KEY
+    )
+
+    return db
 
 def login():
     """
@@ -73,6 +131,11 @@ def login():
             if st.button("Start"):
                 st.session_state.role = role
                 st.session_state.user = user
+                with col2:
+                    with st.spinner('Loading Qdrant Vectorstore...'):
+                        database = load_cardiac_vector_store()
+                        st.session_state.db = database
+                
                 st.rerun()   
 
 ### THIS CODE IS TO APPLY USER AND PASSWROD SECURITY TO THE APP ###
@@ -141,7 +204,6 @@ def logout():
     st.session_state.last_name = None
     st.session_state.query = None
     st.session_state.query_id = None
-    st.session_state.messages = []
 
     st.rerun()
 
@@ -223,12 +285,12 @@ def set_up_home_pages():
         icon=":material/book:",
     )
 
-    account_pages = [settings, logout_page ]
+    account_pages = [logout_page ]
     patient_pages = [request_1]
     provider_pages = [provider_1, provider_2]
     admin_pages = [admin_1]
 
-    #st.logo(image="images/logo_3_copy.png", icon_image="images/Logo.png")
+    st.logo(image="./images/chat-logo.png", icon_image="./images/chat-logo.png")
 
     page_dict = {}
     if st.session_state.role == 'Patient | Family':
@@ -245,7 +307,7 @@ def set_up_home_pages():
 
     if len(page_dict) > 0:
         with st.sidebar:
-            API_KEY = st.text_input('type you OpenAI API KEY', placeholder='OpenAI API KEY', type='password')
+            #API_KEY = st.text_input('type you OpenAI API KEY', placeholder='OpenAI API KEY', type='password')
             st.session_state.open_ai_api_key = API_KEY
 
             pg = st.navigation(page_dict | {"Account": account_pages})

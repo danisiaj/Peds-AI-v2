@@ -6,10 +6,6 @@ import pandas as pd
 import pymysql
 import time
 from openai import OpenAI
-from langchain_openai import OpenAIEmbeddings
-from langchain_qdrant import QdrantVectorStore, RetrievalMode
-from qdrant_client import QdrantClient
-from qdrant_client.http.models import Distance
 from uuid import uuid4
 import json
 
@@ -34,52 +30,9 @@ def client_openai_init():
 
     return client_openai
 
-def openai_embeddings():
-    """
-    This function builds the embeddings function using the OpenAI API
 
-    Returns: 
-        - embedding_model, embedding function from OpenAI
-    """
 
-    # Embeddings object from OpenAI
-    embeddings_model = OpenAIEmbeddings(model="text-embedding-ada-002", api_key=API_KEY)
 
-    return embeddings_model
-
-# Initialize Qdrant Client
-def qdrant_client_init():
-    """
-    This function initializes the Qdrant object
-    """
-    qdrant_client = QdrantClient(
-        url=st.secrets.qdrant_cloud_url,
-        api_key=st.secrets.qdrant_API_KEY    
-    )
-
-    return qdrant_client
-
-def load_cardiac_vector_store():
-    """
-    Loads or retrieves the Qdrant vector store for the cardiology dataset.
-
-    Returns:
-        - vector_store: Qdrant database
-    """
-
-    embeddings = openai_embeddings()
-
-    db = QdrantVectorStore.from_existing_collection(
-        collection_name="peds_cardiology",
-        embedding=embeddings,
-        retrieval_mode=RetrievalMode.DENSE,
-        prefer_grpc=False,
-        distance=Distance.COSINE,
-        location=st.secrets.qdrant_cloud_url,
-        api_key=st.secrets.qdrant_API_KEY
-    )
-
-    return db
 ##### 1. Set up Page #####
 
 # Function to print the header of the page
@@ -128,24 +81,6 @@ def get_query():
     query = st.text_area('type your question here', placeholder='e.g.: Tell me about HLHS')
 
     return query
-
-def transcribe_audio(audio_input, client_openai):
-    # Send audio data to OpenAI Whisper API for transcription
-    
-    with st.spinner("Transcribing audio..."):
-        # Call OpenAI Whisper API to transcribe the audio
-        response = client_openai.audio.transcriptions.create(
-            model="whisper-1",
-            file=audio_input,
-            prompt='Provide an accurate transcription of the audio file. Be aware the user most likely is going to ask about cardiology or nephrology topics'
-        )
-        # Extract transcript from the response
-        transcript = response.text
-        st.write(transcript)
-    
-    return transcript
-        
-    # You can now use the transcribed text as input for your model or further processing
 
 def pymysql_connection():
     return pymysql.connect(
@@ -371,14 +306,13 @@ def stream_data(text):
         time.sleep(0.001)
 
 # Function to set up form in Streamlit and display the process
-def set_up_user_form(collection, query, client_openai, language):
+def set_up_user_form(db, collection, query, client_openai, language):
     """
     This function build the form element in Streamlit and build the interface for the user
 
     Arguments: db, vector store; query, str; client_openai, connection with OpenAI API
     """
 
-    db = load_cardiac_vector_store()
     st.session_state.collection = "Cardiology"
     
 
@@ -490,8 +424,10 @@ def get_evaluation_from_LLM_as_a_judge(client_openai, prompt_for_eval):
     return evaluation_dict
 
 def main():
+    st.logo(image="app/images/chat-logo.png", icon_image="app/images/chat-logo.png")
+
     client_openai = client_openai_init()
-    db = load_cardiac_vector_store()
+    db = st.session_state.db
     st.session_state.collection = "Cardiology"
     collection, language = set_up_page()
 
@@ -506,17 +442,17 @@ def main():
         st.session_state.query = query # Stores query into current session for later use of the data
 
         st.session_state.messages.append({"role": "user", "content": query})
-        with st.chat_message("user"):
+        with st.chat_message(name="user", avatar='app/images/user-logo.png'):
             st.markdown(query)
 
-        with st.chat_message("assistant"):
+        with st.chat_message(name="assistant", avatar='app/images/chat-logo.png'):
             answer = get_response(db, query, client_openai, collection, language) 
             st.write_stream(stream_data(answer))        
         st.session_state.messages.append({"role": "assistant", "content": answer})
     
     if st.button('Clear chat History'):
         st.session_state.messages = []
-        st.chat_message(st.session_state.messages)
+        st.rerun()  
 
 main()
 
