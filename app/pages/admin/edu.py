@@ -381,7 +381,12 @@ def main():
         certifications_filters()
     with tab2:
         st.info('This tab uses MySQL to load the dataframe containing the queries made by different users')
-        query_history()
+        queries_password = st.text_input("Admin password: ", placeholder="Password", type='password')
+        access = st.button('Access')
+        if queries_password == st.secrets.queries_password:
+            if access:
+                query_history()
+        
 
 
 
