@@ -39,132 +39,11 @@ def client_openai_init():
 def set_up_page():
     """
     This function sets up the header of the page Peds AI
-    it also set the 'collection' selectbox to choose the vector store later
-
-    Returns:
-        - collection: str
     """
 
-    st.subheader('Peds Cards AI')
-    language = st.selectbox("   Choose your language", LANGUAGES) 
-
- 
-
-    return language
-
+    return st.subheader('Peds Cards AI')
 
 ##### 2. Functions to generate the prompt and retrieve the answer from our LLM #####
-
-# User query function
-def get_query():
-    """
-    This function prompts the user to type a question and store the query into the current session
-
-    Return: query, str
-    """
-
-    # Initializes the text_input object and gets the query from the user
-    query = st.text_area('type your question here', placeholder='e.g.: Tell me about HLHS')
-
-    return query
-
-def pymysql_connection():
-    return pymysql.connect(
-        host='localhost',  # Replace with your host
-        user='root',  # Replace with your username
-        password=st.secrets.sql_password,  # Replace with your password
-        database='nurses_data'  # Replace with your database name
-    )
-
-def setup_database_for_user_query():
-    """
-    This function builds the table in the dataset in MySQL to store any new question from the user
-    *** QUESTIONS COME FROM THE PEDS_AI PAGE
-
-    Arguments:
-        - db_config: dict, information to connect to MySQL
-    """
-
-
-    # Establish connection with MySQL
-    connection = pymysql_connection()
-    cursor = connection.cursor()
-
-    # Build the query
-    cursor.execute("""
-
-        CREATE TABLE IF NOT EXISTS user_questions (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            user VARCHAR(255),
-            question TEXT,
-            topic TEXT
-            )
-        """
-    )
-
-    # Execute the query
-    connection.commit()
-    connection.close()
-
-def store_user_question(df):
-    """
-    This function takes the dataframe with all the questions from the users and update the database in MyQSL
-    *** QUESTIONS COME FROM THE PEDS_AI PAGE
-
-    Arguments:
-        - db_config: dict, information to connect to MySQL
-    """
-
-    # Establish connection
-    connection = pymysql_connection()
-
-    # Upload DataFrames to SQL using pymysql connection
-    try:
-        with connection.cursor() as cursor:
-            # Insert data into personal_info table
-            queries_columns = ', '.join(df.columns)
-
-            for index, row in df.iterrows():
-                query_store_queries = f"INSERT INTO user_questions ({queries_columns}) VALUES ({', '.join(['%s'] * len(df.columns))})"
-                cursor.execute(query_store_queries, tuple(row))
-            
-            # Commit the transaction
-            connection.commit()
-            print("DataFrames uploaded successfully.")
-    except Exception as e:
-        print("Error while uploading DataFrames:", e)
-    finally:
-        connection.close() 
-
-def query_history():
-    """
-    This function stores the user, question and the topic in a dataframe. 
-    """
-    
-    # Check if user and query are not None before continuing
-    if st.session_state.user is not None and st.session_state.query is not None:        
-        # Check if the combination of 'user' and 'question' in new_row already exists in nurses_data
-        if not ((st.session_state.user_queries['user'] == st.session_state.user) & 
-                (st.session_state.user_queries['question'] == st.session_state.query)).any():
-            # Merge only if it doesn't exist
-            new_row = pd.DataFrame([{
-                                'user': st.session_state.user, 
-                                'question': st.session_state.query,
-                                'topic':st.session_state.collection
-                                }])
-            user_queries = pd.concat([st.session_state.user_queries, new_row], ignore_index=True)
-            st.session_state.user_queries = user_queries
-            
-            # Update MySQL database with the new datapoint
-            setup_database_for_user_query()
-            store_user_question(new_row) 
-
-        else:
-            pass
-      
-    elif st.session_state.query is None:
-        pass
-
 
 # Similarity Search function
 def perform_similarity_search(query, db):
@@ -410,13 +289,15 @@ def get_evaluation_from_LLM_as_a_judge(client_openai, prompt_for_eval):
     return evaluation_dict
 
 def main():
-    st.logo(image="app/images/chat-logo.png", icon_image="app/images/chat-logo.png")
 
+    set_up_page()
     client_openai = client_openai_init()
     db = st.session_state.db
     collection = 'Cardiology' 
     st.session_state.collection = collection
-    language = set_up_page()
+    
+    language = st.selectbox("   Choose your language", LANGUAGES) 
+
 
     if "messages" not in st.session_state:
         st.session_state.messages = []
