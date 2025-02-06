@@ -56,15 +56,12 @@ def set_up_page():
                 User's queries will be stored using MySQL for further analysis.
             """, 
         icon="ℹ️")
-    col1, col2, = st.columns([1,1])
-    with col1:
-        collection = st.selectbox("   Choose your topic", COLLECTIONS) 
-    with col2:
-        language = st.selectbox("   Choose your language", LANGUAGES) 
+
+    language = st.selectbox("   Choose your language", LANGUAGES) 
 
  
 
-    return collection, language
+    return language
 
 
 ##### 2. Functions to generate the prompt and retrieve the answer from our LLM #####
@@ -428,8 +425,9 @@ def main():
 
     client_openai = client_openai_init()
     db = st.session_state.db
-    st.session_state.collection = "Cardiology"
-    collection, language = set_up_page()
+    collection = 'Cardiology' 
+    st.session_state.collection = collection
+    language = set_up_page()
 
     if "messages" not in st.session_state:
         st.session_state.messages = []
