@@ -208,6 +208,7 @@ def logout():
     st.session_state.last_name = None
     st.session_state.query = None
     st.session_state.query_id = None
+    st.session_state.messages = []
 
     st.rerun()
 

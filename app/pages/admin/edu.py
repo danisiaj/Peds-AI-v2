@@ -359,7 +359,6 @@ def query_history():
             
             # Update MySQL database with the new datapoint
             setup_database_for_user_query()
-            store_user_question(new_row) 
             load_queries_database()
 
         else:
