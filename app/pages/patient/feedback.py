@@ -56,19 +56,14 @@ def store_feedback_query(df):
         connection.close() 
 
 def main():
-    # Initialize session state for feedback if not set
-    if "feedback_text" not in st.session_state:
-        st.session_state.feedback_text = ""
 
-    # Text area linked to session state
     feedback = st.text_area(
         label="Did you enjoy it? What can we do better?", 
-        placeholder="Type your feedback here", 
-        key="feedback_text"
+        placeholder="Type your feedback here"
     )
 
     if st.button("Submit feedback"):
-        if feedback:  # Ensure feedback is not empty before submitting
+        if feedback: 
             new_row = pd.DataFrame([{
                 'user': st.session_state.user, 
                 'feedback': feedback,
@@ -76,9 +71,10 @@ def main():
             }])
             store_feedback_query(new_row)
             st.success("Thank you so much for your feedback!")
+            st.rerun()
 
-            # Clear text area after submission
-            st.session_state.feedback_text = ""
+
+
 
 
 
