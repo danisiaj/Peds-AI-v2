@@ -375,19 +375,22 @@ def query_history():
 def main():
 
     set_up_page()
-    tab1, tab2 = st.tabs(["Nurses", "Queries"])
-    with tab1:
-        st.info('This tab uses data from a CSV file for data visualization.')
-        certifications_filters()
-    with tab2:
-        st.info('This tab uses MySQL to load the dataframe containing the queries made by different users')
-        queries_password = st.text_input("Admin password: ", placeholder="Password", type='password')
-        access = st.button('Access')
-        if queries_password == st.secrets.queries_password:
-            if access:
+    queries_password = st.text_input("Admin password: ", placeholder="Password", type='password')
+    access = st.button('Access')
+    if queries_password == st.secrets.queries_password:
+        if access:
+            tab1, tab2 = st.tabs(["Nurses", "Queries"])
+            with tab1:
+                st.info('This tab uses data from a CSV file for data visualization.')
+                certifications_filters()
+            with tab2:
+                st.info('This tab uses MySQL to load the dataframe containing the queries made by different users')
                 query_history()
-            else:
-                pass
+        else:
+            pass
+    else:
+        st.error('Wrong password, try again')
+    
         
 
 
