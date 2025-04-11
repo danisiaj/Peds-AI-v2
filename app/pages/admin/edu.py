@@ -377,8 +377,9 @@ def main():
     set_up_page()
     queries_password = st.text_input("Admin password: ", placeholder="Password", type='password')
     access = st.button('Access')
-    if queries_password == st.secrets.queries_password:
-        if access:
+    if access:
+        if queries_password == st.secrets.queries_password:
+        
             tab1, tab2 = st.tabs(["Nurses", "Queries"])
             with tab1:
                 st.info('This tab uses data from a CSV file for data visualization.')
@@ -387,9 +388,10 @@ def main():
                 st.info('This tab uses MySQL to load the dataframe containing the queries made by different users')
                 query_history()
         else:
-            pass
+            st.error('Wrong password, try again')
     else:
-        st.error('Wrong password, try again')
+        pass
+
     
         
 
